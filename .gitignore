@@ -1,0 +1,14 @@
+# 本機開發設定與代理工作目錄
+.agents/
+.aws/
+.codex/
+
+# 可由 scripts/package-chrome-store.js 重新產生的發布檔
+dist/
+
+# 使用者提供的暫存原始圖片；實際擴充功能圖示位於 icons/
+2c403301-76fe-4efb-8052-8acd3ec885eb.png
+
+# 系統暫存檔
+.DS_Store
+Thumbs.db

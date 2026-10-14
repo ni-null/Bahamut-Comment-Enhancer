@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="巴哈留言優化工具隱私權說明">
+    <title>隱私權說明｜巴哈留言優化工具</title>
+    <style>
+      :root { color-scheme: light dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      body { max-width: 760px; margin: 0 auto; padding: 40px 20px 64px; line-height: 1.75; color: #2d3748; }
+      h1, h2 { color: #117e96; line-height: 1.3; }
+      h1 { margin: 0; font-size: clamp(1.75rem, 5vw, 2.4rem); }
+      h2 { margin-top: 2.25rem; font-size: 1.3rem; }
+      a { color: #117e96; overflow-wrap: anywhere; }
+      .updated { margin-top: .35rem; color: #6b7280; }
+      .summary { padding: 16px 18px; border-left: 4px solid #117e96; border-radius: 4px; background: #eef9fa; }
+      @media (prefers-color-scheme: dark) {
+        body { color: #e5e7eb; background: #111827; }
+        .updated { color: #9ca3af; }
+        .summary { background: #123b43; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>隱私權說明</h1>
+      <p class="updated">最後更新：2026 年 10 月 14 日</p>
+
+      <h2>概要</h2>
+      <p>巴哈留言優化工具（以下稱「本擴充功能」）重視你的隱私。本說明說明本擴充功能如何運作，以及是否處理任何資料。</p>
+      <p class="summary"><strong>簡要說明：</strong>本擴充功能不收集、儲存或傳送任何個人資料。所有功能與設定處理都在你的瀏覽器與裝置本機完成。</p>
+
+      <h2>我們不收集的資料</h2>
+      <p>本擴充功能不會收集任何個人資料，包含：</p>
+      <ul>
+        <li>不追蹤瀏覽紀錄、論壇閱讀行為或點擊行為。</li>
+        <li>不收集帳號、名稱、留言內容、頭像或其他可識別個人身分的資料。</li>
+        <li>不使用 Cookie、追蹤像素、分析工具、廣告 SDK 或錯誤回報服務。</li>
+        <li>不將任何資料上傳或傳送至外部伺服器。</li>
+      </ul>
+
+      <h2>本擴充功能如何運作</h2>
+      <p>本擴充功能只會在巴哈姆特論壇的下列頁面執行：</p>
+      <ul>
+        <li><code>https://forum.gamer.com.tw/C.php*</code></li>
+        <li><code>https://forum.gamer.com.tw/Co.php*</code></li>
+      </ul>
+      <p>它會在本機讀取當前頁面的留言 DOM，以提供階層留言、熱門排序、圖片與時間顯示、頭像顯示與其他可選的版面優化。這些處理不會將頁面內容離開你的裝置。</p>
+
+      <h2>設定資料</h2>
+      <p>本擴充功能使用 Chrome 的 <code>storage</code> 權限，僅將你選擇的功能開關與顯示偏好儲存在 Chrome 本機儲存空間。這些設定不會被傳送給開發者或第三方服務。</p>
+
+      <h2>權限與網域存取</h2>
+      <p>本擴充功能只要求 <code>storage</code> 權限，並僅在上述兩種 <code>forum.gamer.com.tw</code> 頁面注入內容腳本。權限只用於保存設定與在目前頁面提供所述功能，不會用於其他用途。</p>
+
+      <h2>第三方服務</h2>
+      <p>本擴充功能不使用第三方分析、廣告、追蹤、雲端同步或資料處理服務。</p>
+
+      <h2>你的控制權</h2>
+      <p>由於本擴充功能不收集個人資料，沒有可供要求、存取或刪除的遠端資料。你可以隨時在擴充功能選單中還原預設、在 Chrome 移除本擴充功能，或清除 Chrome 的擴充功能網站資料。</p>
+
+      <h2>本說明的更新</h2>
+      <p>若本擴充功能的資料處理方式、權限或功能有重大變更，我們會更新本頁的「最後更新」日期。</p>
+
+      <h2>聯絡與專案資訊</h2>
+      <p>本專案由 ninull 維護。若有疑問、建議或隱私疑慮，請透過 GitHub 專案提出 issue：</p>
+      <p><a href="https://github.com/ni-null/Bahamut-Comment-Enhancer" rel="noopener noreferrer">https://github.com/ni-null/Bahamut-Comment-Enhancer</a></p>
+      <p>本專案為獨立開發專案，與巴哈姆特電玩資訊站無隸屬、合作或背書關係。</p>
+    </main>
+  </body>
+</html>

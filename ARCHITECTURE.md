@@ -23,6 +23,10 @@ comment-parser → structure-validator → sorting → threading / username-foot
 擴充功能圖示放在 `icons/`，目前由 `icon16.png`、`icon32.png`、`icon48.png` 與 `icon128.png`
 組成，並由 `manifest.json` 的 `icons` 欄位引用。
 
+GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy.html`。將 GitHub Pages 設為
+從 `main` 分支的 `/docs` 目錄發布後，隱私權網址為
+`https://ni-null.github.io/Bahamut-Comment-Enhancer/privacy-policy.html`。
+
 ## 模組責任
 
 | 檔案 | 責任 | 不應放入 |

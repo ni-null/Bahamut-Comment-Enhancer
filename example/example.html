@@ -1,0 +1,65 @@
+<!--
+  匿名化測試範例：官方已展開留言區。
+  保留階層、推噓、頭像與 footer 的必要結構，供本擴充功能手動驗證。
+-->
+<div class="c-post__footer c-reply">
+  <div class="c-reply__head nocontent">
+    <a id="showoldCommend_100001" href="javascript:;">顯示較早留言</a>
+  </div>
+
+  <div id="Commendlist_100001">
+    <div class="c-reply__item" id="Commendcontent_1001" name="comment_parent"
+      data-comment="{&quot;bsn&quot;:1,&quot;snB&quot;:100001,&quot;sn&quot;:1001,&quot;content&quot;:&quot;這是第一則匿名範例留言。&quot;}">
+      <div>
+        <button type="button" class="more tippy-reply-menu" aria-expanded="false"><i class="material-icons">more_vert</i></button>
+        <a class="reply-avatar user--sm" href="//home.gamer.com.tw/example-user-1" target="_blank">
+          <img class="gamercard" data-gamercard-userid="example-user-1" src="https://example.invalid/avatar-1.png">
+        </a>
+        <div class="reply-content">
+          <a class="reply-content__user" href="//home.gamer.com.tw/example-user-1" target="_blank">範例使用者一</a>
+          <article class="reply-content__article c-article"><span class="comment_content" data-formatted="yes">這是第一則匿名範例留言。</span></article>
+          <div class="reply-content__footer">
+            <div class="edittime" style="margin-right:6px" name="comment_floor">B1</div>
+            <div class="edittime" data-tippy-content="留言時間 2026-01-01 12:00:00">2026-01-01 12:00:00</div>
+            <div class="buttonbar">
+              <button type="button" onclick="Forum.C.commentGp(this);" class="gp" title="推一個！"><i class="material-icons">thumb_up</i></button>
+              <a data-gp="0" href="javascript:;" class="gp-count"></a>
+              <button type="button" onclick="Forum.C.commentBp(this);" class="bp" title="我要噓…"><i class="material-icons">thumb_down</i></button>
+              <a data-bp="0" href="javascript:;" class="bp-count"></a>
+              <button class="tag" type="button" onclick="Forum.C.replyToFloor(1, 1001, 1);">回覆</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="c-reply__item" id="Commendcontent_1002" name="comment_parent"
+      data-comment="{&quot;bsn&quot;:1,&quot;snB&quot;:100001,&quot;sn&quot;:1002,&quot;content&quot;:&quot;#B1:1001# 這是回覆第一則留言的匿名範例。&quot;,&quot;B1&quot;:&quot;範例使用者一&quot;}">
+      <div>
+        <button type="button" class="more tippy-reply-menu" aria-expanded="false"><i class="material-icons">more_vert</i></button>
+        <a class="reply-avatar user--sm" href="//home.gamer.com.tw/example-user-2" target="_blank">
+          <img class="gamercard" data-gamercard-userid="example-user-2" src="https://example.invalid/avatar-2.png">
+        </a>
+        <div class="reply-content">
+          <a class="reply-content__user" href="//home.gamer.com.tw/example-user-2" target="_blank">範例使用者二</a>
+          <article class="reply-content__article c-article"><span class="comment_content" data-formatted="yes"><a href="javascript:Forum.C.openCommentDialog(1, 100001, 1001);">B1(範例使用者一)</a> 這是回覆第一則留言的匿名範例。</span></article>
+          <div class="reply-content__footer">
+            <div class="edittime" style="margin-right:6px" name="comment_floor">B2</div>
+            <div class="edittime" data-tippy-content="留言時間 2026-01-01 12:05:00">2026-01-01 12:05:00</div>
+            <div class="buttonbar">
+              <button type="button" onclick="Forum.C.commentGp(this);" class="gp is-highlight" title="推一個！"><i class="material-icons">thumb_up</i></button>
+              <a data-gp="3" href="javascript:;" class="gp-count is-highlight">3</a>
+              <button type="button" onclick="Forum.C.commentBp(this);" class="bp" title="我要噓…"><i class="material-icons">thumb_down</i></button>
+              <a data-bp="1" href="javascript:;" class="bp-count">1</a>
+              <button class="tag" type="button" onclick="Forum.C.replyToFloor(1, 1002, 2);">回覆</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-reply__editor">
+    <textarea class="content-edit" placeholder="留言⋯"></textarea>
+  </div>
+</div>

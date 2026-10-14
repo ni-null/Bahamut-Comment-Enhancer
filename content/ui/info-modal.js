@@ -36,6 +36,7 @@
       '.comment-thread-info-modal__dialog h3 { margin: 10px 0 3px; color: #117e96; font-size: .95em; }',
       '.comment-thread-info-modal__dialog p { margin: 0; font-size: .92em; line-height: 1.6; }',
       '.comment-thread-info-modal__dialog p + p { margin-top: 4px; }',
+      '.comment-thread-info-modal__dialog a { color: #117e96; overflow-wrap: anywhere; }',
       '.comment-thread-info-modal__dialog ul { margin: 3px 0 0; padding-left: 18px; font-size: .9em; line-height: 1.6; }'
     ].join('\n');
     document.head.appendChild(style);
@@ -71,6 +72,9 @@
       '<i class="material-icons" aria-hidden="true">close</i></button>',
       '<h2 id="comment-thread-info-modal-title">巴哈留言優化工具</h2>',
       '<p>版本：' + version + '・Chrome Manifest V3</p>',
+      '<h3>專案</h3>',
+      '<p>開發者：ninull</p>',
+      '<p>專案網址：<a href="https://github.com/ni-null/Bahamut-Comment-Enhancer" target="_blank" rel="noopener noreferrer">github.com/ni-null/Bahamut-Comment-Enhancer</a></p>',
       '<h3>介紹</h3>',
       '<p>提供階層留言、熱門排序與多種留言顯示優化，僅在巴哈 C.php、Co.php 頁面運作。</p>',
       '<p>本項目開源，無廣告，無營利，無追蹤統計資料回傳，所有處理都在本地電腦完成。</p>',

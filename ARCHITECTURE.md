@@ -140,6 +140,10 @@ comment-parser → structure-validator → sorting → threading / username-foot
 
 ## 手動驗證清單
 
+匿名化測試 fixture 位於 `example/example.html`（已展開結構）與
+`example/example-not-open.html`（未展開結構）。兩者保留外掛所需的 DOM 與回覆關係，但不含真實
+帳號、頭像來源或留言內容。
+
 1. 在 `chrome://extensions` 重新載入未封裝擴充功能。
 2. 開啟符合路徑的 `forum.gamer.com.tw/C.php` 或 `forum.gamer.com.tw/Co.php` 頁面，確認留言區右上角齒輪出現；其他論壇頁面不應注入任何控制項。
 3. 分別切換每個功能後重整頁面，確認儲存的設定會直接生效。

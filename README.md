@@ -24,6 +24,19 @@
 - 沒有廣告、追蹤統計、背景程序或伺服器資料回傳；所有處理皆在本機完成。
 - [隱私權說明](docs/privacy-policy.html)
 
+## 開發方式
+
+日常開發以 Chrome 未封裝擴充功能為主，不需要先執行打包指令：
+
+1. 在 Chrome 開啟 `chrome://extensions`。
+2. 開啟右上角的「開發人員模式」。
+3. 點選「載入未封裝項目」，並選取專案根目錄（包含 `manifest.json` 的資料夾）。
+4. 修改 `content/`、`manifest.json` 或 `icons/` 後，回到擴充功能頁面按「重新載入」。
+5. 開啟巴哈姆特 `C.php` 或 `Co.php` 測試；瀏覽器開發者工具的 Console 可查看腳本錯誤。
+
+Chrome 根目錄 Manifest 是開發時的唯一來源；`browser/` 不存放功能程式碼，只負責 Firefox、Edge 與
+Tampermonkey 的封裝設定。建議先在 Chrome 驗證功能，再建立各平台發佈檔。
+
 ## 多瀏覽器建置
 
 既有開發原始碼維持在根目錄；`browser/` 僅放各平台的封裝設定與建置工具。可建立 Chrome、Firefox、Edge
@@ -35,21 +48,6 @@ node browser/build.js all --package
 
 各平台指令、輸出位置與發佈用途請見 [browser/README.md](browser/README.md)。
 
-## 舊版 Chrome 商店打包指令
-
-在專案根目錄執行：
-
-```bash
-node scripts/package-chrome-store.js
-```
-
-完成後會在 `dist/` 建立帶有目前版本號的 ZIP。壓縮檔根目錄直接包含
-`manifest.json`，可上傳至 Chrome 線上應用程式商店。
-
-此為不含背景程序的 Manifest V3 擴充功能。它只會在
-`https://forum.gamer.com.tw/C.php*` 與 `https://forum.gamer.com.tw/Co.php*` 注入內容腳本，
-提供階層留言、熱門排序與各種留言顯示優化。
-
 ## 文件
 
 - [README.md](README.md)：安裝與基本使用說明。
@@ -59,11 +57,3 @@ node scripts/package-chrome-store.js
 
 本專案採用 [MIT License](LICENSE)。
 
-## 安裝
-
-1. 開啟 `chrome://extensions`。
-2. 開啟右上角的「開發人員模式」。
-3. 選擇「載入未封裝項目」。
-4. 選取此資料夾。
-
-僅使用 `storage` 權限來記住選項；沒有 service worker，也不會在其他網域或巴哈的其他頁面執行。

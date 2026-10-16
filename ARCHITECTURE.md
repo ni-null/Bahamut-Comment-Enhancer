@@ -27,12 +27,6 @@ Tampermonkey 會產生可直接安裝的 `.user.js`。完整操作與輸出清�
 Tampermonkey 版本沿用相同的內容腳本順序，透過 `GM_getValue`／`GM_setValue` 保存設定；擴充功能版本則仍使用
 `chrome.storage.local`。兩者都只會匹配 C.php 與 Co.php。
 
-## 舊版 Chrome 商店封裝
-
-執行 `node scripts/package-chrome-store.js` 可在 `dist/` 產生可發布的 ZIP。腳本只收錄
-`manifest.json`、`content/` 與存在時的 `icons/`、`assets/`、`_locales/`；範例 HTML、文件與開發
-腳本不會被包進去，且 ZIP 根目錄直接包含 `manifest.json`。
-
 擴充功能圖示放在 `icons/`，目前由 `icon16.png`、`icon32.png`、`icon48.png` 與 `icon128.png`
 組成，並由 `manifest.json` 的 `icons` 欄位引用。
 

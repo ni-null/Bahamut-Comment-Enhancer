@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "巴哈留言優化工具",
+  "version": "1.13.4",
+  "description": "僅在巴哈姆特論壇 C.php 與 Co.php 頁面提供留言階層、排序與顯示優化。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://forum.gamer.com.tw/C.php*",
+        "https://forum.gamer.com.tw/Co.php*"
+      ],
+      "js": [
+        "content/core/comment-parser.js",
+        "content/core/structure-validator.js",
+        "content/features/sorting.js",
+        "content/features/threading.js",
+        "content/features/username-footer.js",
+        "content/features/avatar.js",
+        "content/features/floor-avatar.js",
+        "content/features/image-preview.js",
+        "content/features/relative-time.js",
+        "content/features/footer-collapse.js",
+        "content/features/reaction-inline.js",
+        "content/features/reply-annotation.js",
+        "content/ui/info-modal.js",
+        "content/ui/control-menu.js",
+        "content/services/settings.js",
+        "content/main.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

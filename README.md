@@ -1,6 +1,6 @@
 # 巴哈留言優化工具
 
-> 讓巴哈姆特論壇留言更容易閱讀、整理與互動的 Chrome 擴充功能。
+> 讓巴哈姆特論壇留言更容易閱讀、整理與互動的瀏覽器擴充功能與 Userscript。
 
 ## 介紹
 
@@ -20,11 +20,22 @@
 ### 隱私與範圍
 
 - 僅在 `https://forum.gamer.com.tw/C.php*` 與 `https://forum.gamer.com.tw/Co.php*` 執行。
-- 僅使用 Chrome `storage` 權限保存本機設定。
+- 擴充功能版本僅使用瀏覽器 `storage` 權限保存本機設定；Tampermonkey 版本使用其本機腳本儲存空間。
 - 沒有廣告、追蹤統計、背景程序或伺服器資料回傳；所有處理皆在本機完成。
 - [隱私權說明](docs/privacy-policy.html)
 
-## 建立 Chrome 商店上傳檔
+## 多瀏覽器建置
+
+既有開發原始碼維持在根目錄；`browser/` 僅放各平台的封裝設定與建置工具。可建立 Chrome、Firefox、Edge
+與 Tampermonkey 版本：
+
+```bash
+node browser/build.js all --package
+```
+
+各平台指令、輸出位置與發佈用途請見 [browser/README.md](browser/README.md)。
+
+## 舊版 Chrome 商店打包指令
 
 在專案根目錄執行：
 
@@ -43,6 +54,10 @@ node scripts/package-chrome-store.js
 
 - [README.md](README.md)：安裝與基本使用說明。
 - [ARCHITECTURE.md](ARCHITECTURE.md)：模組責任、設定 schema、效能設計與維護方式。
+
+## 授權
+
+本專案採用 [MIT License](LICENSE)。
 
 ## 安裝
 

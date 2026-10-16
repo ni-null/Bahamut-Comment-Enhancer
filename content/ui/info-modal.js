@@ -52,36 +52,68 @@
     trigger = null;
   }
 
+  function createElement(tagName, className, text) {
+    var element = document.createElement(tagName);
+    if (className) element.className = className;
+    if (typeof text === 'string') element.textContent = text;
+    return element;
+  }
+
+  function createHeading(level, text) {
+    return createElement(level, '', text);
+  }
+
   function getModal() {
     if (modal) return modal;
 
     addStyles();
-    var version = window.chrome && chrome.runtime && chrome.runtime.getManifest
-      ? chrome.runtime.getManifest().version
-      : '—';
+    var version = tools.version || (window.chrome && window.chrome.runtime && window.chrome.runtime.getManifest
+      ? window.chrome.runtime.getManifest().version
+      : '—');
     modal = document.createElement('div');
     modal.className = 'comment-thread-info-modal';
     modal.hidden = true;
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-labelledby', 'comment-thread-info-modal-title');
-    modal.innerHTML = [
-      '<div class="comment-thread-info-modal__backdrop"></div>',
-      '<section class="comment-thread-info-modal__dialog">',
-      '<button type="button" class="comment-thread-info-modal__close" aria-label="關閉開發者資訊" title="關閉">',
-      '<i class="material-icons" aria-hidden="true">close</i></button>',
-      '<h2 id="comment-thread-info-modal-title">巴哈留言優化工具</h2>',
-      '<p>版本：' + version + '・Chrome Manifest V3</p>',
-      '<h3>專案</h3>',
-      '<p>開發者：ninull</p>',
-      '<p>專案網址：<a href="https://github.com/ni-null/Bahamut-Comment-Enhancer" target="_blank" rel="noopener noreferrer">github.com/ni-null/Bahamut-Comment-Enhancer</a></p>',
-      '<h3>介紹</h3>',
-      '<p>提供階層留言、熱門排序與多種留言顯示優化，僅在巴哈 C.php、Co.php 頁面運作。</p>',
-      '<p>本項目開源，無廣告，無營利，無追蹤統計資料回傳，所有處理都在本地電腦完成。</p>',
-      '</section>'
-    ].join('');
-    modal.querySelector('.comment-thread-info-modal__close').addEventListener('click', close);
-    modal.querySelector('.comment-thread-info-modal__backdrop').addEventListener('click', close);
+    var backdrop = createElement('div', 'comment-thread-info-modal__backdrop');
+    var dialog = createElement('section', 'comment-thread-info-modal__dialog');
+    var closeButton = createElement('button', 'comment-thread-info-modal__close');
+    closeButton.type = 'button';
+    closeButton.setAttribute('aria-label', '關閉開發者資訊');
+    closeButton.title = '關閉';
+    var closeIcon = createElement('i', 'material-icons', 'close');
+    closeIcon.setAttribute('aria-hidden', 'true');
+    closeButton.appendChild(closeIcon);
+
+    var title = createHeading('h2', '巴哈留言優化工具');
+    title.id = 'comment-thread-info-modal-title';
+    var versionText = createElement('p', '', '版本：' + version + '・瀏覽器擴充功能／Userscript');
+    var projectHeading = createHeading('h3', '專案');
+    var developer = createElement('p', '', '開發者：ninull');
+    var project = createElement('p', '', '專案網址：');
+    var projectLink = createElement('a', '', 'github.com/ni-null/Bahamut-Comment-Enhancer');
+    projectLink.href = 'https://github.com/ni-null/Bahamut-Comment-Enhancer';
+    projectLink.target = '_blank';
+    projectLink.rel = 'noopener noreferrer';
+    project.appendChild(projectLink);
+    var introductionHeading = createHeading('h3', '介紹');
+    var introduction = createElement('p', '', '提供階層留言、熱門排序與多種留言顯示優化，僅在巴哈 C.php、Co.php 頁面運作。');
+    var privacy = createElement('p', '', '本項目開源，無廣告，無營利，無追蹤統計資料回傳，所有處理都在本地電腦完成。');
+
+    dialog.appendChild(closeButton);
+    dialog.appendChild(title);
+    dialog.appendChild(versionText);
+    dialog.appendChild(projectHeading);
+    dialog.appendChild(developer);
+    dialog.appendChild(project);
+    dialog.appendChild(introductionHeading);
+    dialog.appendChild(introduction);
+    dialog.appendChild(privacy);
+    modal.appendChild(backdrop);
+    modal.appendChild(dialog);
+    closeButton.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && !modal.hidden) close();
     });

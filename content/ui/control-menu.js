@@ -174,6 +174,14 @@
     return title;
   }
 
+  function createMaterialIcon(name) {
+    var icon = document.createElement('i');
+    icon.className = 'material-icons';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = name;
+    return icon;
+  }
+
   function createActions(onReset) {
     var actions = document.createElement('div');
     actions.className = CONTROL_MENU_CLASS + '__actions';
@@ -184,7 +192,8 @@
     resetButton.type = 'button';
     resetButton.className = CONTROL_MENU_CLASS + '__reset';
     resetButton.title = '還原所有顯示設定為預設值';
-    resetButton.innerHTML = '<i class="material-icons" aria-hidden="true">refresh</i>還原預設';
+    resetButton.appendChild(createMaterialIcon('refresh'));
+    resetButton.appendChild(document.createTextNode('還原預設'));
     resetButton.addEventListener('click', onReset);
     row.appendChild(resetButton);
 
@@ -194,7 +203,7 @@
     infoButton.setAttribute('aria-label', '查看開發者資訊與功能介紹');
     infoButton.setAttribute('aria-expanded', 'false');
     infoButton.title = '開發者資訊與功能介紹';
-    infoButton.innerHTML = '<i class="material-icons" aria-hidden="true">info</i>';
+    infoButton.appendChild(createMaterialIcon('info'));
     infoButton.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -239,10 +248,14 @@
     var validation = document.createElement('div');
     validation.className = CONTROL_MENU_CLASS + '__validation';
     validation.setAttribute('role', 'status');
-    validation.innerHTML = [
-      '<p class="' + CONTROL_MENU_CLASS + '__validation-title">驗證失敗，功能暫時停用</p>',
-      '<p class="' + CONTROL_MENU_CLASS + '__validation-message">' + reason + ' 頁面結構恢復後會自動重新檢查。</p>'
-    ].join('');
+    var title = document.createElement('p');
+    title.className = CONTROL_MENU_CLASS + '__validation-title';
+    title.textContent = '驗證失敗，功能暫時停用';
+    var message = document.createElement('p');
+    message.className = CONTROL_MENU_CLASS + '__validation-message';
+    message.textContent = reason + ' 頁面結構恢復後會自動重新檢查。';
+    validation.appendChild(title);
+    validation.appendChild(message);
     return validation;
   }
 
@@ -264,7 +277,7 @@
     gear.setAttribute('aria-label', '留言顯示設定');
     gear.setAttribute('aria-expanded', 'false');
     gear.title = isValid ? '留言顯示設定' : '頁面結構驗證失敗，功能暫時停用';
-    gear.innerHTML = '<i class="material-icons" aria-hidden="true">settings</i>';
+    gear.appendChild(createMaterialIcon('settings'));
 
     var menu = document.createElement('div');
     menu.className = CONTROL_MENU_CLASS;

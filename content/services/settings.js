@@ -1,5 +1,5 @@
 /**
- * 功能簡介：集中管理擴充功能的預設設定與 chrome.storage.local 讀寫。
+ * 功能簡介：集中管理擴充功能的預設設定與本機儲存讀寫。
  * 新增或修改設定 schema 時，應只在此模組處理驗證、預設值與儲存容錯。
  */
 (function (window) {
@@ -67,35 +67,57 @@
     };
   }
 
-  function hasStorage() {
-    return Boolean(window.chrome && chrome.storage && chrome.storage.local);
+  function hasExtensionStorage() {
+    return Boolean(window.chrome && window.chrome.storage && window.chrome.storage.local);
+  }
+
+  function hasUserscriptStorage() {
+    return typeof GM_getValue === 'function' && typeof GM_setValue === 'function';
   }
 
   function load(callback) {
-    if (!hasStorage()) {
-      callback(normalize());
-      return;
+    if (hasExtensionStorage()) {
+      try {
+        window.chrome.storage.local.get(STORAGE_KEY, function (stored) {
+          if (window.chrome.runtime && window.chrome.runtime.lastError) {
+            callback(normalize());
+            return;
+          }
+          callback(normalize(stored && stored[STORAGE_KEY]));
+        });
+        return;
+      } catch (error) {
+        callback(normalize());
+        return;
+      }
     }
-
-    try {
-      chrome.storage.local.get(STORAGE_KEY, function (stored) {
-        if (chrome.runtime && chrome.runtime.lastError) {
-          callback(normalize());
-          return;
-        }
-        callback(normalize(stored && stored[STORAGE_KEY]));
-      });
-    } catch (error) {
-      callback(normalize());
+    if (hasUserscriptStorage()) {
+      try {
+        callback(normalize(GM_getValue(STORAGE_KEY, null)));
+        return;
+      } catch (error) {
+        // 使用者腳本儲存空間不可用時，安全退回預設值。
+      }
     }
+    callback(normalize());
   }
 
   function save(settings) {
-    if (!hasStorage()) return;
-    try {
-      chrome.storage.local.set({ [STORAGE_KEY]: normalize(settings) });
-    } catch (error) {
-      // A failed write must not prevent the current page from using its state.
+    var normalized = normalize(settings);
+    if (hasExtensionStorage()) {
+      try {
+        window.chrome.storage.local.set({ [STORAGE_KEY]: normalized });
+        return;
+      } catch (error) {
+        // A failed write must not prevent the current page from using its state.
+      }
+    }
+    if (hasUserscriptStorage()) {
+      try {
+        GM_setValue(STORAGE_KEY, normalized);
+      } catch (error) {
+        // A failed write must not prevent the current page from using its state.
+      }
     }
   }
 

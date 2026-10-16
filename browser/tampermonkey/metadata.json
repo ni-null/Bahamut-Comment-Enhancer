@@ -1,0 +1,11 @@
+{
+  "name": "巴哈留言優化工具",
+  "namespace": "https://github.com/ni-null/Bahamut-Comment-Enhancer",
+  "description": "僅在巴哈姆特論壇 C.php 與 Co.php 頁面提供留言階層、排序與顯示優化。",
+  "author": "ninull",
+  "license": "MIT",
+  "matches": [
+    "https://forum.gamer.com.tw/C.php*",
+    "https://forum.gamer.com.tw/Co.php*"
+  ]
+}

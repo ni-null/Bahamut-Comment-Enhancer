@@ -14,7 +14,20 @@ comment-parser → structure-validator → sorting → threading / username-foot
 
 所有模組共用 `window.BahamutCommentTools` 命名空間，但不會污染論壇頁面的其他名稱。
 
-## Chrome 商店封裝
+## 多瀏覽器封裝
+
+共用功能原始碼維持於專案根目錄的 `content/`、`icons/`，以及 Chrome 開發用的 `manifest.json`；不會因
+平台封裝而搬移或複製功能模組。`browser/` 只負責封裝資訊：Chrome 直接使用根目錄 Manifest，Firefox 與
+Edge 各有自己的 MV3 Manifest，Tampermonkey 使用中繼資料產生單一 userscript。
+
+執行 `node browser/build.js <chrome|firefox|edge|tampermonkey|all> [--package]` 可建立指定目標。
+建置目錄為 `dist/browser/<目標>/`；加上 `--package` 時，三個擴充功能會在 `dist/` 產生商店可上傳的 ZIP，
+Tampermonkey 會產生可直接安裝的 `.user.js`。完整操作與輸出清單見 `browser/README.md`。
+
+Tampermonkey 版本沿用相同的內容腳本順序，透過 `GM_getValue`／`GM_setValue` 保存設定；擴充功能版本則仍使用
+`chrome.storage.local`。兩者都只會匹配 C.php 與 Co.php。
+
+## 舊版 Chrome 商店封裝
 
 執行 `node scripts/package-chrome-store.js` 可在 `dist/` 產生可發布的 ZIP。腳本只收錄
 `manifest.json`、`content/` 與存在時的 `icons/`、`assets/`、`_locales/`；範例 HTML、文件與開發

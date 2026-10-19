@@ -1,6 +1,6 @@
 /**
- * 功能簡介：要求頁面主世界直接呼叫官方 extendComment() 展開較早留言，不模擬 javascript: 連結 click。
- * 參數、橋接回應與逾時都會安全處理；完成後不呼叫 foldedComment()，保留使用者手動收合權限。
+ * 功能簡介：留言區接近可視範圍時，透過頁面橋接安全呼叫官方 extendComment() 展開較早留言。
+ * 處理可視範圍觀察、請求、回應與設定；不模擬 javascript: 連結 click。
  */
 (function (window, document) {
   'use strict';
@@ -9,7 +9,72 @@
   var REQUEST_EVENT = 'bahamut-comment-auto-expand-request';
   var RESULT_EVENT = 'bahamut-comment-auto-expand-result';
   var REQUEST_TIMEOUT = 5000;
+  var VIEWPORT_MARGIN = '600px 0px 600px 0px';
   var nextRequestId = 0;
+  var visibilityObserver = null;
+
+  function getObserveTarget(list) {
+    return list.parentElement || list;
+  }
+
+  function getVisibilityObserver() {
+    if (!('IntersectionObserver' in window)) return null;
+    if (visibilityObserver) return visibilityObserver;
+
+    visibilityObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+
+        var target = entry.target;
+        var list = target._commentThreadAutoExpandList;
+        visibilityObserver.unobserve(target);
+        delete target._commentThreadAutoExpandList;
+        if (!list || !list.isConnected || list._commentThreadAutoExpandDone ||
+          list._commentThreadAutoExpandPending) return;
+
+        var control = findExpandControl(list);
+        if (!control) {
+          list._commentThreadAutoExpandDone = true;
+          return;
+        }
+        var params = getExtendParams(control);
+        if (!params) {
+          list._commentThreadAutoExpandDone = true;
+          reportError('無法解析官方 extendComment() 的留言參數。');
+          return;
+        }
+        requestExpand(list, params);
+      });
+    }, {
+      root: null,
+      rootMargin: VIEWPORT_MARGIN,
+      threshold: 0
+    });
+    return visibilityObserver;
+  }
+
+  function stopObservingVisibility(list) {
+    var target = list._commentThreadAutoExpandObserveTarget;
+    if (!target) return;
+    if (visibilityObserver) visibilityObserver.unobserve(target);
+    if (target._commentThreadAutoExpandList === list) {
+      delete target._commentThreadAutoExpandList;
+    }
+    delete list._commentThreadAutoExpandObserveTarget;
+  }
+
+  function observeWhenNearViewport(list) {
+    var observer = getVisibilityObserver();
+    if (!observer) return false;
+
+    var target = getObserveTarget(list);
+    if (list._commentThreadAutoExpandObserveTarget === target) return true;
+    stopObservingVisibility(list);
+    target._commentThreadAutoExpandList = list;
+    list._commentThreadAutoExpandObserveTarget = target;
+    observer.observe(target);
+    return true;
+  }
 
   function findExpandControl(list) {
     var host = list.parentElement;
@@ -80,11 +145,16 @@
 
   function apply(list, enabled) {
     if (!enabled) {
+      stopObservingVisibility(list);
       clearPendingRequest(list);
       delete list._commentThreadAutoExpandDone;
       return;
     }
     if (list._commentThreadAutoExpandDone || list._commentThreadAutoExpandPending) return;
+
+    if (observeWhenNearViewport(list)) return;
+
+    // 舊版瀏覽器沒有 IntersectionObserver 時，安全退回立即展開。
     var control = findExpandControl(list);
     if (!control) {
       list._commentThreadAutoExpandDone = true;

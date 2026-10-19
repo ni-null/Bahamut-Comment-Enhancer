@@ -51,7 +51,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
 | `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
 | `content/features/auto-expand-page.js` | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果 | 外掛 UI、留言 DOM 處理 |
-| `content/features/auto-expand.js` | 解析官方展開連結的參數，透過 MAIN-world 橋接請求 `extendComment()`，並處理回應、逾時與錯誤；不呼叫 `foldedComment()` | 官方留言載入流程 |
+| `content/features/auto-expand.js` | 以 `IntersectionObserver` 等待留言區接近可視範圍後，解析官方展開連結的參數並透過 MAIN-world 橋接請求 `extendComment()`；處理回應、逾時與錯誤，不呼叫 `foldedComment()` | 官方留言載入流程 |
 | `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
 | `content/ui/control-menu.js` | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作 | 設定儲存、留言功能套用 |
 | `content/services/settings.js` | `chrome.storage.local` 的 schema、預設值、讀寫與容錯 | 頁面 DOM |
@@ -104,7 +104,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 群組 | 控制項 | 行為 |
 | --- | --- | --- |
 | 階層留言 | `階層留言` | 最多三層；關閉時會攤平回原本 DOM 順序。 |
-| 留言與排序 | `自動展開所有留言` | 解析官方「顯示較早留言」控制項的 `bsn`、`snB`，直接呼叫網站的 `extendComment()` 載入留言；具錯誤與逾時保護，且不呼叫 `foldedComment()`，不會干預使用者手動收合。 |
+| 留言與排序 | `自動展開所有留言` | 留言區進入視窗上下 600px 的預載範圍時，才解析官方「顯示較早留言」控制項的 `bsn`、`snB` 並直接呼叫網站的 `extendComment()`；具錯誤與逾時保護，且不呼叫 `foldedComment()`，不會干預使用者手動收合。 |
 | 階層留言 | `遮蔽樓層標注` | 次級選項，僅階層留言開啟時可操作；隱藏內文第一個 `Forum.C.openCommentDialog` 連結（例如 `B12(william)`）。關閉階層時不刪除其偏好值。 |
 | 階層留言 | `顯示階層分隔線` | 次級選項，預設顯示子留言左側的階層分隔線；取消勾選即可隱藏。 |
 | 排序 | `原始`、`熱門排序` | 獨立於階層功能；原始排序還原初見的留言順序。 |

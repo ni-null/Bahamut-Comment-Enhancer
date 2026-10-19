@@ -1,6 +1,6 @@
 /**
- * 功能簡介：在論壇頁面的主世界安全呼叫官方 extendComment()，讓隔離的內容腳本不必模擬 javascript: 連結。
- * 此檔只接收指定事件與數字參數；所有官方函式呼叫皆以 try/catch 保護並回傳結果。
+ * 功能簡介：在頁面主世界安全呼叫官方 extendComment()，供 auto-expand.js 以事件橋接使用。
+ * 此檔不處理留言 DOM 或設定；所有官方函式呼叫皆以 try/catch 保護並回傳結果。
  */
 (function (window, document) {
   'use strict';

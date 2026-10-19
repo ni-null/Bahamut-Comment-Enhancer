@@ -113,7 +113,9 @@
     if (observer) observer.disconnect();
     list.dataset.commentThreadRefreshing = 'true';
     try {
-      autoExpand.apply(list, state.autoExpandCommentsEnabled);
+      if (autoExpand && typeof autoExpand.apply === 'function') {
+        autoExpand.apply(list, state.autoExpandCommentsEnabled);
+      }
       if (state.threadingEnabled) threading.apply(list, state.commentSortMode, state.showThreadSeparators);
       else {
         threading.flatten(list);

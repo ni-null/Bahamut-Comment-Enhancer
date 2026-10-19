@@ -38,9 +38,9 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 
 | 檔案 | 責任 | 不應放入 |
 | --- | --- | --- |
-| `content/core/comment-parser.js` | 選擇器、留言 ID、回覆父 ID 的解析 | DOM 重排、設定讀寫、UI |
+| `content/core/comment-parser.js` | 選擇器、留言 ID、單一或多個回覆父 ID 的解析 | DOM 重排、設定讀寫、UI |
 | `content/core/structure-validator.js` | 驗證官方留言容器、清單與展開／未展開結構，回傳可安全掛載的容器與原因 | DOM 修改、選單顯示、功能套用 |
-| `content/features/threading.js` | 最多三層的留言階層化與攤平 | 選單、儲存、AJAX 觀察器 |
+| `content/features/threading.js` | 最多三層的留言階層化與攤平；多重標註時為每個父留言建立視覺副本 | 選單、儲存、AJAX 觀察器 |
 | `content/features/sorting.js` | 提供原始與熱門度比較器；僅階層模式會以 0.6 權重將子分支熱門度回饋父分支 | 選單、儲存 |
 | `content/features/username-footer.js` | 將用戶名移至 footer 的樓層號後方，並以 placeholder 還原原位置與樣式 | 留言階層、設定讀寫 |
 | `content/features/avatar.js` | 控制留言頭像顯示方式與圓形／方形樣式 | 選單、設定讀寫、AJAX observer |
@@ -49,7 +49,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/relative-time.js` | 在預設日期與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
 | `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
-| `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭的 `B樓層(用戶名)` 回覆樓層標注 | 階層開關與選單狀態 |
+| `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
 | `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
 | `content/ui/control-menu.js` | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作 | 設定儲存、留言功能套用 |
 | `content/services/settings.js` | `chrome.storage.local` 的 schema、預設值、讀寫與容錯 | 頁面 DOM |
@@ -127,6 +127,8 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 - 未開啟階層時，熱門排序只依該留言的 `a[data-gp]` 讚數排序。
 - 已開啟階層時，每一層的兄弟留言依「分支熱門度」排序：
   `自身讚數 + 所有直接子分支熱門度 × 0.6`。
+- 一則留言同時標註多個有效樓層時，原留言保留在第一個有效父留言下，並在其餘被標註父留言下建立視覺副本；
+  副本不帶重複的 DOM `id`，不會在下次重整時被當成獨立留言解析。
 - 權重會遞迴計算，因此熱門子留言可提升父留言與整個討論串，但不會破壞父子關係。
 - 同分時保留初始出現順序，讓排序穩定。
 
@@ -158,7 +160,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 1. 在 `chrome://extensions` 重新載入未封裝擴充功能。
 2. 開啟符合路徑的 `forum.gamer.com.tw/C.php` 或 `forum.gamer.com.tw/Co.php` 頁面，確認留言區右上角齒輪出現；其他論壇頁面不應注入任何控制項。
 3. 分別切換每個功能後重整頁面，確認儲存的設定會直接生效。
-4. 開啟／關閉階層留言，確認最多三層、關閉後會還原平面順序；並確認遮蔽樓層標注僅於階層模式生效。
+4. 開啟／關閉階層留言，確認最多三層、關閉後會還原平面順序；一則同時標註多個已載入樓層的留言，應在每個被標註樓層下顯示一份，並確認遮蔽樓層標注僅於階層模式生效。
 5. 在平面模式驗證熱門排序只看本身讚數；在階層模式驗證熱門子留言會以 0.6 權重提升父分支。
 6. 測試用戶名是否位於 `B33` 等樓層號後方、頭像顯示與圓形／方形樣式、樓層徽章位置、圖片縮小與 Hover 顯示、預設／相對時間切換、互動區摺疊與展開；並確認推、推數、噓、噓數可移至留言右側且關閉後完整回到 buttonbar。
 7. 使用「還原預設」，確認所有功能關閉、頭像回預設、排序回原始。

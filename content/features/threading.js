@@ -42,6 +42,9 @@
 
   function flatten(list) {
     var editor = list.querySelector(':scope > .c-reply__editor');
+    Array.prototype.slice.call(list.querySelectorAll('[data-comment-thread-copy="true"]')).forEach(function (copy) {
+      copy.remove();
+    });
     parser.collectItems(list).forEach(function (item) {
       list.insertBefore(item, editor || null);
       delete item.dataset.threadDepth;
@@ -62,11 +65,18 @@
         id: parser.getCommentId(item),
         item: item,
         index: index,
-        parentId: parser.getParentId(item),
+        parentIds: parser.getParentIds(item),
+        parentId: null,
         depth: null
       };
       byId[record.id] = record;
       return record;
+    });
+
+    records.forEach(function (record) {
+      record.parentId = record.parentIds.find(function (parentId) {
+        return Boolean(byId[parentId]);
+      }) || record.parentIds[0] || null;
     });
 
     flatten(list);
@@ -84,10 +94,10 @@
       return record.depth;
     }
 
-    function getVisualParent(record) {
-      if (!record.parentId || !byId[record.parentId]) return null;
+    function getVisualParent(record, parentId) {
+      if (!parentId || !byId[parentId]) return null;
 
-      var parent = byId[record.parentId];
+      var parent = byId[parentId];
       var ancestors = Object.create(null);
       ancestors[record.id] = true;
       for (var cursor = parent; cursor; cursor = cursor.parentId ? byId[cursor.parentId] : null) {
@@ -98,6 +108,16 @@
         parent = parent.parentId ? byId[parent.parentId] : null;
       }
       return parent || null;
+    }
+
+    function createThreadCopy(record, parent, depth) {
+      var copy = record.item.cloneNode(true);
+      copy.removeAttribute('id');
+      copy.setAttribute('data-comment-thread-copy', 'true');
+      copy.dataset.threadDepth = String(depth);
+      copy.dataset.threadParent = parent.id;
+      copy.removeAttribute('data-thread-truncated');
+      getChildrenContainer(parent).appendChild(copy);
     }
 
     function getChildrenContainer(parent) {
@@ -116,12 +136,22 @@
       return difference || compareRecords(left, right);
     }).forEach(function (record) {
       var actualDepth = getDepth(record, Object.create(null));
-      var parent = getVisualParent(record);
+      var parent = getVisualParent(record, record.parentId);
       record.item.dataset.threadDepth = String(parent ? Math.min(actualDepth, MAX_DEPTH) : 1);
-      record.item.dataset.threadParent = record.parentId || '';
+      record.item.dataset.threadParent = record.parentIds.join(',');
       record.item.toggleAttribute('data-thread-truncated', actualDepth > MAX_DEPTH);
       if (parent) getChildrenContainer(parent).appendChild(record.item);
       else list.insertBefore(record.item, editor || null);
+
+      var copiedParents = Object.create(null);
+      if (parent) copiedParents[parent.id] = true;
+      record.parentIds.forEach(function (parentId) {
+        if (parentId === record.parentId) return;
+        var copyParent = getVisualParent(record, parentId);
+        if (!copyParent || copiedParents[copyParent.id]) return;
+        copiedParents[copyParent.id] = true;
+        createThreadCopy(record, copyParent, Math.min(getDepth(copyParent, Object.create(null)) + 1, MAX_DEPTH));
+      });
     });
   }
 

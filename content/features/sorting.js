@@ -28,8 +28,13 @@
     records.forEach(function (record) {
       setOriginalIndex(record);
       record.likes = getLikes(record);
-      if (useChildWeights && record.parentId && byId[record.parentId]) {
-        (children[record.parentId] || (children[record.parentId] = [])).push(record);
+      var parentIds = record.parentIds || (record.parentId ? [record.parentId] : []);
+      if (useChildWeights) {
+        parentIds.forEach(function (parentId) {
+          if (byId[parentId]) {
+            (children[parentId] || (children[parentId] = [])).push(record);
+          }
+        });
       }
     });
 

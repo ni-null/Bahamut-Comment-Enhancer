@@ -14,6 +14,8 @@
   var imagePreview = tools.features.imagePreview;
   var relativeTime = tools.features.relativeTime;
   var footerCollapse = tools.features.footerCollapse;
+  var replyEditorFollow = tools.features.replyEditorFollow;
+  var replyAnnotationPreview = tools.features.replyAnnotationPreview;
   var reactionInline = tools.features.reactionInline;
   var replyAnnotation = tools.features.replyAnnotation;
   var autoExpand = tools.features.autoExpand;
@@ -130,6 +132,8 @@
       imagePreview.apply(list, state.imageSmallPreviewEnabled, state.imageHoverPreviewEnabled);
       relativeTime.apply(list, state.timeDisplay);
       footerCollapse.apply(list, state.footerInteractionCollapseEnabled);
+      replyEditorFollow.apply(list, state.replyEditorFollowEnabled);
+      replyAnnotationPreview.apply(list, state.replyAnnotationPreviewEnabled);
       reactionInline.apply(list, state.reactionInlineEnabled);
       replyAnnotation.apply(list, state.threadingEnabled && state.hideReplyAnnotation);
     } catch (error) {
@@ -211,6 +215,8 @@
     imagePreview.apply(list, false, false);
     relativeTime.apply(list, 'default');
     footerCollapse.apply(list, false);
+    replyEditorFollow.apply(list, false);
+    replyAnnotationPreview.apply(list, false);
     reactionInline.apply(list, false);
     replyAnnotation.apply(list, false);
     delete list.dataset.commentThreadMounted;

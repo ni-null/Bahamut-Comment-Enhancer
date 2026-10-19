@@ -316,6 +316,8 @@
       { value: 'hot', label: '熱門排序' }
     ], state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('摺疊留言底欄', 'footerInteractionCollapseEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createMenuToggle('回覆框跟隨留言', 'replyEditorFollowEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createMenuToggle('標記強化', 'replyAnnotationPreviewEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('推噓移至右側', 'reactionInlineEnabled', state, options.onSettingChange));
 
     var displayGroup = document.createElement('div');

@@ -46,6 +46,8 @@
         "content/features/image-preview.js",
         "content/features/relative-time.js",
         "content/features/footer-collapse.js",
+        "content/features/reply-editor-follow.js",
+        "content/features/reply-annotation-preview.js",
         "content/features/reaction-inline.js",
         "content/features/reply-annotation.js",
         "content/features/auto-expand.js",

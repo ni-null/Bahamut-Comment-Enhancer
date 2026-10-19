@@ -17,6 +17,8 @@
     imageHoverPreviewEnabled: false,
     timeDisplay: 'default',
     footerInteractionCollapseEnabled: false,
+    replyEditorFollowEnabled: false,
+    replyAnnotationPreviewEnabled: false,
     reactionInlineEnabled: false,
     floorAtAvatarEnabled: false,
     hideReplyAnnotation: false,
@@ -53,6 +55,12 @@
       footerInteractionCollapseEnabled: value && typeof value.footerInteractionCollapseEnabled === 'boolean'
         ? value.footerInteractionCollapseEnabled
         : DEFAULTS.footerInteractionCollapseEnabled,
+      replyEditorFollowEnabled: value && typeof value.replyEditorFollowEnabled === 'boolean'
+        ? value.replyEditorFollowEnabled
+        : DEFAULTS.replyEditorFollowEnabled,
+      replyAnnotationPreviewEnabled: value && typeof value.replyAnnotationPreviewEnabled === 'boolean'
+        ? value.replyAnnotationPreviewEnabled
+        : DEFAULTS.replyAnnotationPreviewEnabled,
       reactionInlineEnabled: value && typeof value.reactionInlineEnabled === 'boolean'
         ? value.reactionInlineEnabled
         : DEFAULTS.reactionInlineEnabled,

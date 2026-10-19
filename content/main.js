@@ -16,6 +16,7 @@
   var footerCollapse = tools.features.footerCollapse;
   var reactionInline = tools.features.reactionInline;
   var replyAnnotation = tools.features.replyAnnotation;
+  var autoExpand = tools.features.autoExpand;
   var controlMenu = tools.ui.controlMenu;
   var structureValidator = tools.structureValidator;
   var storage = tools.settings;
@@ -34,7 +35,8 @@
       state.imageHoverPreviewEnabled || state.timeDisplay !== 'default' ||
       state.footerInteractionCollapseEnabled || state.floorAtAvatarEnabled ||
       state.reactionInlineEnabled ||
-      state.avatarShape !== 'round' || state.commentSortMode !== 'default';
+      state.avatarShape !== 'round' || state.commentSortMode !== 'default' ||
+      state.autoExpandCommentsEnabled;
   }
 
   function syncControls() {
@@ -111,6 +113,7 @@
     if (observer) observer.disconnect();
     list.dataset.commentThreadRefreshing = 'true';
     try {
+      autoExpand.apply(list, state.autoExpandCommentsEnabled);
       if (state.threadingEnabled) threading.apply(list, state.commentSortMode, state.showThreadSeparators);
       else {
         threading.flatten(list);

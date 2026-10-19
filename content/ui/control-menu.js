@@ -302,6 +302,7 @@
     commentGroup.className = CONTROL_MENU_CLASS + '__group';
     commentGroup.appendChild(createGroupTitle('留言與排序'));
     commentGroup.appendChild(createMenuToggle('階層留言', 'threadingEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createMenuToggle('自動展開所有留言', 'autoExpandCommentsEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('階層時遮蔽樓層', 'hideReplyAnnotation', state, options.onSettingChange, {
       secondary: true,
       disabled: !state.threadingEnabled

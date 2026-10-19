@@ -52,7 +52,9 @@ function buildExtension(target) {
 }
 
 function getContentScriptPaths() {
-  return getManifest('chrome').content_scripts[0].js;
+  return getManifest('chrome').content_scripts.reduce(function (paths, contentScript) {
+    return paths.concat(contentScript.js || []);
+  }, []);
 }
 
 function createUserscriptHeader(metadata, version) {
@@ -71,6 +73,7 @@ function createUserscriptHeader(metadata, version) {
   lines.push(
     '// @grant        GM_getValue',
     '// @grant        GM_setValue',
+    '// @grant        unsafeWindow',
     '// @run-at       document-idle',
     '// @noframes',
     '// ==/UserScript==',

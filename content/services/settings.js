@@ -20,6 +20,7 @@
     reactionInlineEnabled: false,
     floorAtAvatarEnabled: false,
     hideReplyAnnotation: false,
+    autoExpandCommentsEnabled: false,
     commentSortMode: 'default'
   });
 
@@ -61,6 +62,9 @@
       hideReplyAnnotation: value && typeof value.hideReplyAnnotation === 'boolean'
         ? value.hideReplyAnnotation
         : DEFAULTS.hideReplyAnnotation,
+      autoExpandCommentsEnabled: value && typeof value.autoExpandCommentsEnabled === 'boolean'
+        ? value.autoExpandCommentsEnabled
+        : DEFAULTS.autoExpandCommentsEnabled,
       commentSortMode: value && ['default', 'hot'].indexOf(value.commentSortMode) !== -1
         ? value.commentSortMode
         : DEFAULTS.commentSortMode

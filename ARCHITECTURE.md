@@ -9,7 +9,7 @@ service worker。
 腳本依 manifest 的陣列順序執行；不要任意調換順序。
 
 ```text
-comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reaction-inline / reply-annotation → info-modal / control-menu → settings → main
+auto-expand-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reaction-inline / reply-annotation / auto-expand → info-modal / control-menu → settings → main
 ```
 
 所有模組共用 `window.BahamutCommentTools` 命名空間，但不會污染論壇頁面的其他名稱。
@@ -50,6 +50,8 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
 | `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
 | `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
+| `content/features/auto-expand-page.js` | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果 | 外掛 UI、留言 DOM 處理 |
+| `content/features/auto-expand.js` | 解析官方展開連結的參數，透過 MAIN-world 橋接請求 `extendComment()`，並處理回應、逾時與錯誤；不呼叫 `foldedComment()` | 官方留言載入流程 |
 | `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
 | `content/ui/control-menu.js` | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作 | 設定儲存、留言功能套用 |
 | `content/services/settings.js` | `chrome.storage.local` 的 schema、預設值、讀寫與容錯 | 頁面 DOM |
@@ -74,6 +76,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
   "reactionInlineEnabled": false,
   "floorAtAvatarEnabled": false,
   "hideReplyAnnotation": false,
+  "autoExpandCommentsEnabled": false,
   "commentSortMode": "default"
 }
 ```
@@ -101,6 +104,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 群組 | 控制項 | 行為 |
 | --- | --- | --- |
 | 階層留言 | `階層留言` | 最多三層；關閉時會攤平回原本 DOM 順序。 |
+| 留言與排序 | `自動展開所有留言` | 解析官方「顯示較早留言」控制項的 `bsn`、`snB`，直接呼叫網站的 `extendComment()` 載入留言；具錯誤與逾時保護，且不呼叫 `foldedComment()`，不會干預使用者手動收合。 |
 | 階層留言 | `遮蔽樓層標注` | 次級選項，僅階層留言開啟時可操作；隱藏內文第一個 `Forum.C.openCommentDialog` 連結（例如 `B12(william)`）。關閉階層時不刪除其偏好值。 |
 | 階層留言 | `顯示階層分隔線` | 次級選項，預設顯示子留言左側的階層分隔線；取消勾選即可隱藏。 |
 | 排序 | `原始`、`熱門排序` | 獨立於階層功能；原始排序還原初見的留言順序。 |
@@ -164,4 +168,5 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 5. 在平面模式驗證熱門排序只看本身讚數；在階層模式驗證熱門子留言會以 0.6 權重提升父分支。
 6. 測試用戶名是否位於 `B33` 等樓層號後方、頭像顯示與圓形／方形樣式、樓層徽章位置、圖片縮小與 Hover 顯示、預設／相對時間切換、互動區摺疊與展開；並確認推、推數、噓、噓數可移至留言右側且關閉後完整回到 buttonbar。
 7. 使用「還原預設」，確認所有功能關閉、頭像回預設、排序回原始。
-8. 點擊選單外部確認自動關閉；載入舊留言或發送／接收 AJAX 新留言，確認新留言沿用目前設定。
+8. 開啟「自動展開所有留言」，確認會依序載入每一批較早留言至控制項消失；關閉時不再觸發官方展開按鈕。
+9. 點擊選單外部確認自動關閉；載入舊留言或發送／接收 AJAX 新留言，確認新留言沿用目前設定。

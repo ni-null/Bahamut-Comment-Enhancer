@@ -7,11 +7,13 @@
 
   var tools = window.BahamutCommentTools;
   var PREVIEW_CLASS = 'comment-thread-reply-marker-preview';
-  var QUICK_MARKER_CLASS = PREVIEW_CLASS + '__quick-add';
+  var FLOOR_MARKER_CLASS = PREVIEW_CLASS + '__floor-add';
   var STYLE_ID = 'comment-thread-reply-marker-preview-styles';
   var states = new WeakMap();
   var textareaHandlers = new WeakMap();
+  var floorHandlers = new WeakMap();
   var replyClickListenerInstalled = false;
+  var editorRestoreListenerInstalled = false;
 
   function addStyles() {
     if (document.getElementById(STYLE_ID)) return;
@@ -30,10 +32,11 @@
       '.' + PREVIEW_CLASS + '__remove:hover,.' + PREVIEW_CLASS + '__remove:focus-visible,.' + PREVIEW_CLASS + '__clear:hover,.' + PREVIEW_CLASS + '__clear:focus-visible { background:rgba(17,126,150,.18); outline:none; }',
       '.' + PREVIEW_CLASS + '__remove > .material-icons { font-size:14px; }',
       '.' + PREVIEW_CLASS + '__clear > .material-icons { font-size:20px; }',
-      '.' + QUICK_MARKER_CLASS + ' { display:inline-flex; align-items:center; justify-content:center; margin-left:4px; border:0; border-radius:3px; padding:2px; background:transparent; color:#699ea9; cursor:pointer; }',
-      '.' + QUICK_MARKER_CLASS + ' > .material-icons { font-size:15px; }',
-      '.' + QUICK_MARKER_CLASS + ':hover,.' + QUICK_MARKER_CLASS + ':focus-visible { background:rgba(105,158,169,.14); outline:none; }',
-      '.' + QUICK_MARKER_CLASS + '[aria-pressed="true"] { color:#699ea9; opacity:.65; cursor:default; }'
+      '.' + FLOOR_MARKER_CLASS + ' { position:relative; border-radius:3px; color:#699ea9; cursor:pointer; }',
+      '.' + FLOOR_MARKER_CLASS + ':hover,.' + FLOOR_MARKER_CLASS + ':focus-visible { background:rgba(105,158,169,.14); outline:none; }',
+      '.' + FLOOR_MARKER_CLASS + '::after { content:attr(data-comment-thread-marker-tooltip); position:absolute; z-index:20; left:50%; bottom:calc(100% + 5px); transform:translateX(-50%); padding:3px 6px; border-radius:3px; background:rgba(28,42,46,.96); color:#fff; font-size:11px; line-height:1.3; white-space:nowrap; pointer-events:none; visibility:hidden; opacity:0; }',
+      '.' + FLOOR_MARKER_CLASS + ':hover::after,.' + FLOOR_MARKER_CLASS + ':focus-visible::after { visibility:visible; opacity:1; }',
+      '.' + FLOOR_MARKER_CLASS + '[aria-pressed="true"] { color:#699ea9; font-weight:700; }'
     ].join('\n');
     document.head.appendChild(style);
   }
@@ -125,55 +128,80 @@
     }) || null;
   }
 
-  function getReplyMarker(button) {
-    var match = String(button.getAttribute('onclick') || '').match(/Forum\.C\.replyToFloor\s*\(\s*\d+\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
-    return match ? { raw: '#B' + match[2] + ':' + match[1] + '#', floor: match[2], commentId: match[1] } : null;
+  function getFloorMarker(floor) {
+    var item = floor.closest('.c-reply__item[id^="Commendcontent_"]');
+    var floorMatch = floor.textContent.trim().match(/^B(\d+)$/i);
+    var commentId = item && item.id.replace(/^Commendcontent_/, '');
+    return floorMatch && commentId
+      ? { raw: '#B' + floorMatch[1] + ':' + commentId + '#', floor: floorMatch[1], commentId: commentId }
+      : null;
   }
 
-  function syncQuickMarkerButtons(host) {
+  function syncFloorMarkers(host) {
     var editor = getOfficialEditor(host);
     var textarea = editor && editor.querySelector('textarea');
     if (!textarea) return;
-    Array.prototype.forEach.call(host.querySelectorAll('.' + QUICK_MARKER_CLASS), function (button) {
-      var marked = textarea.value.indexOf(button.dataset.marker || '') !== -1;
-      button.setAttribute('aria-pressed', String(marked));
-      button.title = marked ? '已加入樓層標記' : '加入樓層標記';
+    Array.prototype.forEach.call(host.querySelectorAll('.' + FLOOR_MARKER_CLASS), function (floor) {
+      var marked = textarea.value.indexOf(floor.dataset.marker || '') !== -1;
+      floor.setAttribute('aria-pressed', String(marked));
     });
   }
 
-  function renderQuickMarkerButtons(host) {
+  function renderFloorMarkers(host) {
     var editor = getOfficialEditor(host);
     var textarea = editor && editor.querySelector('textarea');
     if (!textarea) return;
-    Array.prototype.forEach.call(host.querySelectorAll('button.tag'), function (replyButton) {
-      var marker = getReplyMarker(replyButton);
-      if (!marker || replyButton.parentElement.querySelector('.' + QUICK_MARKER_CLASS + '[data-marker="' + marker.raw + '"]')) return;
-      var add = document.createElement('button');
-      add.type = 'button';
-      add.className = QUICK_MARKER_CLASS;
-      add.dataset.marker = marker.raw;
-      add.setAttribute('aria-label', '標記 B' + marker.floor);
-      add.title = '加入樓層標記';
-      add.appendChild(createIcon('local_offer'));
-      add.addEventListener('click', function (event) {
+    Array.prototype.forEach.call(host.querySelectorAll('[name="comment_floor"]'), function (floor) {
+      var marker = getFloorMarker(floor);
+      if (!marker || floorHandlers.has(floor)) return;
+      floor.classList.add(FLOOR_MARKER_CLASS);
+      floor.dataset.marker = marker.raw;
+      floor.dataset.commentThreadMarkerTooltip = '添加標記';
+      floor.dataset.commentThreadMarkerOriginalTitle = floor.getAttribute('title') || '';
+      floor.setAttribute('title', '添加標記');
+      floor.setAttribute('role', 'button');
+      floor.setAttribute('tabindex', '0');
+      floor.setAttribute('aria-label', '添加 B' + marker.floor + ' 標記');
+      floor.setAttribute('aria-pressed', 'false');
+      var addMarker = function (event) {
         event.preventDefault();
         event.stopPropagation();
         // 追加而非取代，可連續選取多位用戶；不聚焦底部輸入框，避免中斷閱讀位置。
         appendMarkers(textarea, [marker], false);
-        // 新增額外標記代表不再是單一留言回覆，移除既有的回覆鏡像並停止其同步。
+        // 新增額外標記代表不再是單一留言回覆，將官方 editor 還原到底部。
         var replyEditorFollow = tools.features && tools.features.replyEditorFollow;
         if (replyEditorFollow && typeof replyEditorFollow.dismiss === 'function') {
           replyEditorFollow.dismiss(host);
         }
-        syncQuickMarkerButtons(host);
-      });
-      replyButton.insertAdjacentElement('afterend', add);
+        syncFloorMarkers(host);
+      };
+      var onKeydown = function (event) {
+        if (event.key === 'Enter' || event.key === ' ') addMarker(event);
+      };
+      floor.addEventListener('click', addMarker);
+      floor.addEventListener('keydown', onKeydown);
+      floorHandlers.set(floor, { addMarker: addMarker, onKeydown: onKeydown });
     });
-    syncQuickMarkerButtons(host);
+    syncFloorMarkers(host);
   }
 
-  function removeQuickMarkerButtons(host) {
-    Array.prototype.forEach.call(host.querySelectorAll('.' + QUICK_MARKER_CLASS), function (button) { button.remove(); });
+  function removeFloorMarkers(host) {
+    Array.prototype.forEach.call(host.querySelectorAll('.' + FLOOR_MARKER_CLASS), function (floor) {
+      var handlers = floorHandlers.get(floor);
+      if (handlers) {
+        floor.removeEventListener('click', handlers.addMarker);
+        floor.removeEventListener('keydown', handlers.onKeydown);
+        floorHandlers.delete(floor);
+      }
+      floor.classList.remove(FLOOR_MARKER_CLASS);
+      if (floor.dataset.commentThreadMarkerOriginalTitle) floor.setAttribute('title', floor.dataset.commentThreadMarkerOriginalTitle);
+      else floor.removeAttribute('title');
+      ['marker', 'commentThreadMarkerTooltip', 'commentThreadMarkerOriginalTitle'].forEach(function (name) { delete floor.dataset[name]; });
+      floor.removeAttribute('role');
+      floor.removeAttribute('tabindex');
+      floor.removeAttribute('aria-label');
+      floor.removeAttribute('aria-pressed');
+    });
   }
 
   function renderPreview(host, textarea, preview) {
@@ -250,7 +278,7 @@
     if (!textareaHandlers.has(textarea)) {
       var handler = function () {
         renderPreview(host, textarea, preview);
-        syncQuickMarkerButtons(host);
+        syncFloorMarkers(host);
       };
       textarea.addEventListener('input', handler);
       textareaHandlers.set(textarea, handler);
@@ -283,8 +311,8 @@
         else removePreview(editor);
       });
     } else removePreviews(host);
-    if (state.quickMarkerButtonsEnabled) renderQuickMarkerButtons(host);
-    else removeQuickMarkerButtons(host);
+    if (state.quickMarkerButtonsEnabled) renderFloorMarkers(host);
+    else removeFloorMarkers(host);
   }
 
   function installReplyClickListener() {
@@ -300,18 +328,31 @@
     });
   }
 
+  function installEditorRestoreListener() {
+    if (editorRestoreListenerInstalled) return;
+    editorRestoreListenerInstalled = true;
+    document.addEventListener('bahamut-comment-reply-editor-restored', function (event) {
+      var host = event.detail && event.detail.host;
+      // editor 回到底部後，由標記強化本身依當前 DOM 結構重新建立預覽。
+      if (host && states.has(host)) refreshHost(host);
+    });
+  }
+
   function apply(list, previewEnabled, quickMarkerButtonsEnabled) {
     var host = list && list.parentElement;
     if (!host) return;
     if (!previewEnabled && !quickMarkerButtonsEnabled) {
       removePreviews(host);
-      removeQuickMarkerButtons(host);
+      removeFloorMarkers(host);
       states.delete(host);
       return;
     }
     addStyles();
     states.set(host, { previewEnabled: Boolean(previewEnabled), quickMarkerButtonsEnabled: Boolean(quickMarkerButtonsEnabled) });
-    if (previewEnabled) installReplyClickListener();
+    if (previewEnabled) {
+      installReplyClickListener();
+      installEditorRestoreListener();
+    }
     refreshHost(host);
   }
 

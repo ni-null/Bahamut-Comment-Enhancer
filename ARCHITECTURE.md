@@ -9,7 +9,7 @@ service worker。
 腳本依 manifest 的陣列順序執行；不要任意調換順序。
 
 ```text
-auto-expand-page / reply-editor-follow-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reply-editor-follow / reply-annotation-preview / reaction-inline / reply-annotation / auto-expand → info-modal / control-menu → settings → main
+auto-expand-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reply-editor-follow / reply-annotation-preview / reaction-inline / reply-annotation / auto-expand → info-modal / control-menu → settings → main
 ```
 
 所有模組共用 `window.BahamutCommentTools` 命名空間，但不會污染論壇頁面的其他名稱。
@@ -48,12 +48,11 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/image-preview.js` | 控制留言內文圖片縮小預覽與 Hover 時模擬原圖點擊 | 選單、設定讀寫、圖片放大器實作 |
 | `content/features/relative-time.js` | 在預設日期與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
-| `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將內容正規化為本次唯一樓層標記；接著在該留言 footer 下方建立會隨內容自動撐高的編輯器鏡像、還原官方自動定位的捲動位置；鏡像 Enter 會精準轉送到官方原始 editor 的 `keypress` 送出流程；該標記被刪除時會移除鏡像且不聚焦底部 editor | 回覆內容、官方回覆函式、其他留言功能 |
-| `content/features/reply-annotation-preview.js` | 僅在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部；「顯示標記」可獨立控制每則回覆右側的追加標記圖示，不顯示於鏡像回覆框 | 官方輸入框內容、回覆送出流程 |
+| `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將同一個官方 editor 節點搬到該留言 footer 下方；原位置保留可點擊的回復列，點擊即可搬回底部，因此完全沿用官方 Enter、按鈕與事件 | 回覆內容、官方回覆函式、其他留言功能 |
+| `content/features/reply-annotation-preview.js` | 僅在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部；「顯示標記」可獨立控制各樓層號的追加標記互動 | 官方輸入框內容、回覆送出流程 |
 | `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
 | `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
 | `content/features/auto-expand-page.js` | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果 | 外掛 UI、留言 DOM 處理 |
-| `content/features/reply-editor-follow-page.js` | 在 MAIN world 接收鏡像 Enter 請求，定位原始 textarea 並派送官方 `keypress` 相容事件，再回傳處理結果 | 鏡像 UI、設定讀寫 |
 | `content/features/auto-expand.js` | 以 `IntersectionObserver` 等待留言區接近可視範圍後，解析官方展開連結的參數並透過 MAIN-world 橋接請求 `extendComment()`；處理回應、逾時與錯誤，不呼叫 `foldedComment()` | 官方留言載入流程 |
 | `content/features/hide-hot-tag.js` | 以擴充功能屬性隱藏或還原官方 `.comment_hot-tag`，不修改原始留言內容 | 選單、設定讀寫 |
 | `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
@@ -124,9 +123,9 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 顯示 | `時間顯示` | `預設時間`或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。 |
 | 顯示 | `隱藏 HOT 標籤` | 隱藏官方留言上的 `HOT` 標籤；關閉後立即還原。 |
 | 顯示 | `摺疊留言底欄` | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。 |
-| 留言與排序 | `回覆框跟隨留言` | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著在該則 `.reply-content__footer` 最下方建立可操作鏡像回覆框，並避免官方自動捲動到底部編輯器。原始 `.c-reply__editor` 完全不動，鏡像輸入會同步回原始輸入框。 |
+| 留言與排序 | `回覆框跟隨留言` | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著把同一個官方 `.c-reply__editor` 節點搬到該則 `.reply-content__footer` 最下方，原位置保留「回到底部留言框」列。點擊該列、關閉功能或改用多樓層標記時會立即還原，無輸入框複製或同步。 |
 | 留言與排序 | `標記強化` | 在官方底部 `.c-reply__editor` 下方顯示含頭像的標記標籤；每個 X 只刪除對應的 `#B樓層:留言ID#`，右側清除按鈕可移除全部標記，且都會同步觸發官方輸入事件。 |
-| 留言與排序 | `顯示標記` | 獨立控制每則「回覆」右側的 tag 圖示；點擊可追加多個樓層標記到官方底部輸入框。 |
+| 留言與排序 | `顯示標記` | 獨立控制各樓層號的標記互動；Hover 顯示「添加標記」，點擊樓層即可追加多個樓層標記到官方底部輸入框。 |
 | 留言與排序 | `推噓移至右側` | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。 |
 | 圖片 | `縮小預覽` | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。 |
 | 圖片 | `Hover 顯示` | 圖片區塊下的二級選項；游標持續停留 0.5 秒後才模擬原圖的 click，提前移開會取消，沿用論壇既有的圖片放大效果。 |

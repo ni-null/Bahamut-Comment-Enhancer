@@ -10,6 +10,14 @@
     "128": "icons/icon128.png"
   },
   "permissions": ["storage"],
+  "web_accessible_resources": [
+    {
+      "resources": ["content/config/recommended-settings.json"],
+      "matches": [
+        "https://forum.gamer.com.tw/*"
+      ]
+    }
+  ],
   "browser_specific_settings": {
     "gecko": {
       "id": "bahamut-comment-enhancer@ninull.dev",
@@ -25,7 +33,10 @@
         "https://forum.gamer.com.tw/C.php*",
         "https://forum.gamer.com.tw/Co.php*"
       ],
-      "js": ["content/features/auto-expand-page.js"],
+      "js": [
+        "content/features/auto-expand-page.js",
+        "content/features/reply-editor-follow-page.js"
+      ],
       "run_at": "document_idle",
       "all_frames": false,
       "world": "MAIN"
@@ -51,6 +62,7 @@
         "content/features/reaction-inline.js",
         "content/features/reply-annotation.js",
         "content/features/auto-expand.js",
+        "content/features/hide-hot-tag.js",
         "content/ui/info-modal.js",
         "content/ui/control-menu.js",
         "content/services/settings.js",

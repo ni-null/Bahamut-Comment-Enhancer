@@ -19,10 +19,12 @@
   var reactionInline = tools.features.reactionInline;
   var replyAnnotation = tools.features.replyAnnotation;
   var autoExpand = tools.features.autoExpand;
+  var hideHotTag = tools.features.hideHotTag;
   var controlMenu = tools.ui.controlMenu;
   var structureValidator = tools.structureValidator;
   var storage = tools.settings;
   var state = storage.normalize();
+  var recommendedSettings = storage.normalize();
   var relativeTimeTimer = null;
 
   function reportError(context, error) {
@@ -36,9 +38,10 @@
       state.avatarDisplay !== 'default' || state.imageSmallPreviewEnabled ||
       state.imageHoverPreviewEnabled || state.timeDisplay !== 'default' ||
       state.footerInteractionCollapseEnabled || state.floorAtAvatarEnabled ||
-      state.reactionInlineEnabled ||
+      state.reactionInlineEnabled || state.replyAnnotationPreviewEnabled ||
+      state.quickMarkerButtonsEnabled ||
       state.avatarShape !== 'round' || state.commentSortMode !== 'default' ||
-      state.autoExpandCommentsEnabled;
+      state.autoExpandCommentsEnabled || state.hideHotTagEnabled;
   }
 
   function syncControls() {
@@ -78,6 +81,14 @@
 
   function resetSettings() {
     state = storage.normalize(storage.defaults);
+    applySettingsToMountedLists();
+    syncRelativeTimeTimer();
+    syncControls();
+    storage.save(state);
+  }
+
+  function applyRecommendedSettings() {
+    state = storage.normalize(recommendedSettings);
     applySettingsToMountedLists();
     syncRelativeTimeTimer();
     syncControls();
@@ -133,9 +144,14 @@
       relativeTime.apply(list, state.timeDisplay);
       footerCollapse.apply(list, state.footerInteractionCollapseEnabled);
       replyEditorFollow.apply(list, state.replyEditorFollowEnabled);
-      replyAnnotationPreview.apply(list, state.replyAnnotationPreviewEnabled);
+      replyAnnotationPreview.apply(
+        list,
+        state.replyAnnotationPreviewEnabled,
+        state.quickMarkerButtonsEnabled
+      );
       reactionInline.apply(list, state.reactionInlineEnabled);
       replyAnnotation.apply(list, state.threadingEnabled && state.hideReplyAnnotation);
+      hideHotTag.apply(list, state.hideHotTagEnabled);
     } catch (error) {
       reportError('套用留言功能時發生錯誤，已停止本次更新。', error);
     } finally {
@@ -191,6 +207,7 @@
         getState: function () { return state; },
         onSettingChange: setSetting,
         onReset: resetSettings,
+        onRecommend: applyRecommendedSettings,
         validation: validation
       });
     } catch (error) {
@@ -219,6 +236,7 @@
     replyAnnotationPreview.apply(list, false);
     reactionInline.apply(list, false);
     replyAnnotation.apply(list, false);
+    hideHotTag.apply(list, false);
     delete list.dataset.commentThreadMounted;
   }
 
@@ -255,10 +273,14 @@
   };
 
   function start() {
-    storage.load(function (savedState) {
-      state = storage.normalize(savedState);
-      init();
-      syncRelativeTimeTimer();
+    storage.load(function (savedState, hasSavedSettings) {
+      storage.loadRecommended(function (definition) {
+        recommendedSettings = definition.settings;
+        state = hasSavedSettings ? storage.normalize(savedState) : storage.normalize(recommendedSettings);
+        if (!hasSavedSettings) storage.save(state);
+        init();
+        syncRelativeTimeTimer();
+      });
     });
   }
 

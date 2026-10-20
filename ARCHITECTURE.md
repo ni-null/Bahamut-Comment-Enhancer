@@ -9,7 +9,7 @@ service worker。
 腳本依 manifest 的陣列順序執行；不要任意調換順序。
 
 ```text
-auto-expand-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reply-editor-follow / reply-annotation-preview / reaction-inline / reply-annotation / auto-expand → info-modal / control-menu → settings → main
+auto-expand-page / reply-editor-follow-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reply-editor-follow / reply-annotation-preview / reaction-inline / reply-annotation / auto-expand → info-modal / control-menu → settings → main
 ```
 
 所有模組共用 `window.BahamutCommentTools` 命名空間，但不會污染論壇頁面的其他名稱。
@@ -21,8 +21,8 @@ auto-expand-page（MAIN world）→ comment-parser → structure-validator → s
 Edge 各有自己的 MV3 Manifest，Tampermonkey 使用中繼資料產生單一 userscript。
 
 執行 `node browser/build.js <chrome|firefox|edge|tampermonkey|all> [--package]` 可建立指定目標。
-建置目錄為 `dist/browser/<目標>/`；加上 `--package` 時，三個擴充功能會在 `dist/` 產生商店可上傳的 ZIP，
-Tampermonkey 會產生可直接安裝的 `.user.js`。完整操作與輸出清單見 `browser/README.md`。
+中間建置檔只會放在系統暫存區並於結束後刪除；加上 `--package` 時，`dist/` 只會保留三個商店可上傳的 ZIP，
+以及 Tampermonkey 可直接安裝的單一 `.user.js`。完整操作與輸出清單見 `browser/README.md`。
 
 Tampermonkey 版本沿用相同的內容腳本順序，透過 `GM_getValue`／`GM_setValue` 保存設定；擴充功能版本則仍使用
 `chrome.storage.local`。兩者都只會匹配 C.php 與 Co.php。
@@ -48,15 +48,18 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/image-preview.js` | 控制留言內文圖片縮小預覽與 Hover 時模擬原圖點擊 | 選單、設定讀寫、圖片放大器實作 |
 | `content/features/relative-time.js` | 在預設日期與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
-| `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將內容正規化為本次唯一樓層標記；接著在該留言 footer 下方建立編輯器鏡像、還原官方自動定位的捲動位置，原始編輯器保持原樣並與鏡像同步 | 回覆內容、官方回覆函式、其他留言功能 |
-| `content/features/reply-annotation-preview.js` | 強化編輯器下方的 `#B樓層:留言ID#` 標記：預覽、X 刪除、頭像用戶選擇與全部標記 | 官方輸入框內容、回覆送出流程 |
+| `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將內容正規化為本次唯一樓層標記；接著在該留言 footer 下方建立會隨內容自動撐高的編輯器鏡像、還原官方自動定位的捲動位置；鏡像 Enter 會精準轉送到官方原始 editor 的 `keypress` 送出流程；該標記被刪除時會移除鏡像且不聚焦底部 editor | 回覆內容、官方回覆函式、其他留言功能 |
+| `content/features/reply-annotation-preview.js` | 僅在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部；「顯示標記」可獨立控制每則回覆右側的追加標記圖示，不顯示於鏡像回覆框 | 官方輸入框內容、回覆送出流程 |
 | `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
 | `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
 | `content/features/auto-expand-page.js` | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果 | 外掛 UI、留言 DOM 處理 |
+| `content/features/reply-editor-follow-page.js` | 在 MAIN world 接收鏡像 Enter 請求，定位原始 textarea 並派送官方 `keypress` 相容事件，再回傳處理結果 | 鏡像 UI、設定讀寫 |
 | `content/features/auto-expand.js` | 以 `IntersectionObserver` 等待留言區接近可視範圍後，解析官方展開連結的參數並透過 MAIN-world 橋接請求 `extendComment()`；處理回應、逾時與錯誤，不呼叫 `foldedComment()` | 官方留言載入流程 |
+| `content/features/hide-hot-tag.js` | 以擴充功能屬性隱藏或還原官方 `.comment_hot-tag`，不修改原始留言內容 | 選單、設定讀寫 |
 | `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
 | `content/ui/control-menu.js` | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作 | 設定儲存、留言功能套用 |
 | `content/services/settings.js` | `chrome.storage.local` 的 schema、預設值、讀寫與容錯 | 頁面 DOM |
+| `content/config/recommended-settings.json` | 可調整「推薦設定」按鈕套用內容的宣告式設定檔 | 頁面 DOM、功能實作 |
 | `content/main.js` | 設定狀態協調、功能組合、低成本 AJAX observer 與 UI 回呼 | 選單、Modal、留言關聯解析細節 |
 
 ## 設定 schema
@@ -88,9 +91,11 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 新增選項時，先修改 `content/services/settings.js` 的 `DEFAULTS` 與 `normalize()`；
 再於 `content/ui/control-menu.js` 增加選單控制，並於 `content/main.js` 增加功能套用。不要直接讀寫 `chrome.storage`。
 選單的「還原預設」會透過同一 service 套用並儲存 `DEFAULTS`。
+「推薦設定」則讀取 `content/config/recommended-settings.json` 的 `settings` 後套用並儲存；可直接修改該 JSON
+調整推薦按鈕的行為。擴充功能版本於執行時讀取此檔，Tampermonkey 建置時會內嵌同一份內容。
 
-頁面啟動時必須先完成 `settings.load()`，再掛載齒輪與套用功能；因此使用者的
-已儲存偏好會直接生效，不需要再次切換開關。
+頁面啟動時必須先完成 `settings.load()`，再掛載齒輪與套用功能；首次沒有儲存設定時會
+套用並儲存「推薦設定」，既有使用者的已儲存偏好則會直接生效，不需要再次切換開關。
 
 ## 選單與功能行為
 
@@ -117,13 +122,16 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 顯示 | `頭像樣式` | 預設為`圓形`，可切換為`方形`。 |
 | 顯示 | `Hover 顯示樓層` | 滑鼠懸停頭像時，以 `name="comment_floor"` 的樓層數字覆蓋頭像；footer 的原始樓層仍維持顯示。 |
 | 顯示 | `時間顯示` | `預設時間`或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。 |
+| 顯示 | `隱藏 HOT 標籤` | 隱藏官方留言上的 `HOT` 標籤；關閉後立即還原。 |
 | 顯示 | `摺疊留言底欄` | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。 |
 | 留言與排序 | `回覆框跟隨留言` | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著在該則 `.reply-content__footer` 最下方建立可操作鏡像回覆框，並避免官方自動捲動到底部編輯器。原始 `.c-reply__editor` 完全不動，鏡像輸入會同步回原始輸入框。 |
-| 留言與排序 | `標記強化` | 在官方底部 `.c-reply__editor` 下方顯示標記標籤與 `＋`；清單依用戶分組，顯示頭像、名稱與可單獨選取的各樓層。點用戶可標記其全部樓層，也可「全部標記」。每個 X 只刪除對應的 `#B樓層:留言ID#`，並同步觸發官方輸入事件。 |
+| 留言與排序 | `標記強化` | 在官方底部 `.c-reply__editor` 下方顯示含頭像的標記標籤；每個 X 只刪除對應的 `#B樓層:留言ID#`，右側清除按鈕可移除全部標記，且都會同步觸發官方輸入事件。 |
+| 留言與排序 | `顯示標記` | 獨立控制每則「回覆」右側的 tag 圖示；點擊可追加多個樓層標記到官方底部輸入框。 |
 | 留言與排序 | `推噓移至右側` | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。 |
 | 圖片 | `縮小預覽` | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。 |
 | 圖片 | `Hover 顯示` | 圖片區塊下的二級選項；游標持續停留 0.5 秒後才模擬原圖的 click，提前移開會取消，沿用論壇既有的圖片放大效果。 |
 | 動作 | `還原預設` | 儲存所有預設值：關閉全部功能、頭像改為預設、排序改為原始。 |
+| 動作 | `推薦設定` | 套用 `content/config/recommended-settings.json` 所宣告的設定組合並儲存。 |
 | 動作 | `info` 圖示 | 開啟可由關閉按鈕、遮罩或 Esc 關閉的 Modal，顯示目前版本、Manifest V3 開發資訊與功能簡介。 |
 
 選單中的開關採 switch 視覺，啟用色為 `#117e96`。新增選項時應使用既有的

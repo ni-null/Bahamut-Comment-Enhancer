@@ -1,0 +1,24 @@
+{
+  "title": "推薦設定",
+  "description": "適合閱讀長篇討論與回覆串的平衡設定。",
+  "settings": {
+    "threadingEnabled": true,
+    "showThreadSeparators": true,
+    "userNameAtBottomEnabled": false,
+    "avatarDisplay": "default",
+    "avatarShape": "round",
+    "imageSmallPreviewEnabled": false,
+    "imageHoverPreviewEnabled": false,
+    "timeDisplay": "relative",
+    "footerInteractionCollapseEnabled": false,
+    "replyEditorFollowEnabled": true,
+    "replyAnnotationPreviewEnabled": true,
+    "quickMarkerButtonsEnabled": true,
+    "reactionInlineEnabled": false,
+    "floorAtAvatarEnabled": false,
+    "hideReplyAnnotation": true,
+    "autoExpandCommentsEnabled": false,
+    "hideHotTagEnabled": true,
+    "commentSortMode": "default"
+  }
+}

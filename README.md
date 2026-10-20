@@ -16,6 +16,7 @@
 - 頭像大小／圓角、Hover 顯示樓層、用戶名位置與預設／相對時間切換。
 - 留言圖片縮小預覽與停留 Hover 顯示，以及留言底欄摺疊。
 - 所有設定會記住；可隨時從齒輪選單「還原預設」。
+- 齒輪選單提供「推薦設定」；其內容由 [recommended-settings.json](content/config/recommended-settings.json) 控制，方便自行調整常用組合。
 
 ### 隱私與範圍
 
@@ -43,8 +44,13 @@ Tampermonkey 的封裝設定。建議先在 Chrome 驗證功能，再建立各�
 與 Tampermonkey 版本：
 
 ```bash
+npm install
 node browser/build.js all --package
 ```
+
+建置只會壓縮 `dist/` 的發佈檔，開發原始碼維持可讀。每次建置都會清空舊的 `dist/`，在
+`all --package` 下僅留下 Chrome、Edge、Firefox 三個 ZIP 與一個 Tampermonkey `.user.js`。採用 Terser 的一般壓縮與變數縮短，
+不使用混淆、動態執行或遠端程式碼，符合一般瀏覽器商店的可審查發佈方式。
 
 各平台指令、輸出位置與發佈用途請見 [browser/README.md](browser/README.md)。
 

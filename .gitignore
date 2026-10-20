@@ -5,6 +5,7 @@
 
 # 可由 scripts/package-chrome-store.js 重新產生的發布檔
 dist/
+node_modules/
 
 # 使用者提供的暫存原始圖片；實際擴充功能圖示位於 icons/
 2c403301-76fe-4efb-8052-8acd3ec885eb.png

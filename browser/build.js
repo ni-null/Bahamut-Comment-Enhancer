@@ -5,11 +5,14 @@
 'use strict';
 
 var fs = require('fs');
+var os = require('os');
 var path = require('path');
+var terser;
 
 var BROWSER_DIRECTORY = __dirname;
 var PROJECT_ROOT = path.resolve(BROWSER_DIRECTORY, '..');
-var OUTPUT_DIRECTORY = path.join(PROJECT_ROOT, 'dist', 'browser');
+var DIST_DIRECTORY = path.join(PROJECT_ROOT, 'dist');
+var TEMP_DIRECTORY = fs.mkdtempSync(path.join(os.tmpdir(), 'bahamut-comment-enhancer-build-'));
 var EXTENSION_TARGETS = ['chrome', 'firefox', 'edge'];
 var TARGETS = EXTENSION_TARGETS.concat(['tampermonkey']);
 
@@ -42,12 +45,51 @@ function getManifest(target) {
   return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 }
 
-function buildExtension(target) {
-  var outputPath = path.join(OUTPUT_DIRECTORY, target);
+function getTerser() {
+  if (!terser) {
+    try {
+      terser = require('terser');
+    } catch (error) {
+      throw new Error('找不到 Terser，請先執行 npm install。');
+    }
+  }
+  return terser;
+}
+
+async function minifyJavaScript(source, filename) {
+  var minifier = getTerser();
+  var result = await minifier.minify({ [filename]: source }, {
+    compress: true,
+    mangle: true,
+    format: {
+      comments: false
+    }
+  });
+  if (!result.code) throw new Error('無法壓縮 JavaScript：' + filename);
+  return result.code;
+}
+
+async function minifyDirectory(directory) {
+  var entries = fs.readdirSync(directory, { withFileTypes: true });
+  for (var index = 0; index < entries.length; index += 1) {
+    var entry = entries[index];
+    var entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      await minifyDirectory(entryPath);
+    } else if (entry.isFile() && path.extname(entry.name) === '.js') {
+      var source = fs.readFileSync(entryPath, 'utf8');
+      fs.writeFileSync(entryPath, await minifyJavaScript(source, entryPath), 'utf8');
+    }
+  }
+}
+
+async function buildExtension(target) {
+  var outputPath = path.join(TEMP_DIRECTORY, target);
   cleanDirectory(outputPath);
   fs.writeFileSync(path.join(outputPath, 'manifest.json'), JSON.stringify(getManifest(target), null, 2) + '\n');
   copyDirectory(path.join(PROJECT_ROOT, 'content'), path.join(outputPath, 'content'));
   copyDirectory(path.join(PROJECT_ROOT, 'icons'), path.join(outputPath, 'icons'));
+  await minifyDirectory(path.join(outputPath, 'content'));
   return outputPath;
 }
 
@@ -57,7 +99,7 @@ function getContentScriptPaths() {
   }, []);
 }
 
-function createUserscriptHeader(metadata, version) {
+function createUserscriptHeader(metadata, version, recommendedSettings) {
   var lines = [
     '// ==UserScript==',
     '// @name         ' + metadata.name,
@@ -80,22 +122,25 @@ function createUserscriptHeader(metadata, version) {
     '',
     'window.BahamutCommentTools = window.BahamutCommentTools || {};',
     'window.BahamutCommentTools.version = ' + JSON.stringify(version) + ';',
+    'window.BahamutCommentTools.recommendedSettingsDefinition = ' + JSON.stringify(recommendedSettings) + ';',
     ''
   );
   return lines.join('\n');
 }
 
-function buildUserscript() {
+async function buildUserscript() {
   var metadata = JSON.parse(fs.readFileSync(path.join(BROWSER_DIRECTORY, 'tampermonkey', 'metadata.json'), 'utf8'));
   var manifest = getManifest('chrome');
-  var outputPath = path.join(OUTPUT_DIRECTORY, 'tampermonkey');
-  var scriptPath = path.join(outputPath, 'bahamut-comment-enhancer.user.js');
-  cleanDirectory(outputPath);
+  var recommendedSettings = JSON.parse(fs.readFileSync(
+    path.join(PROJECT_ROOT, 'content', 'config', 'recommended-settings.json'), 'utf8'
+  ));
+  var scriptPath = path.join(DIST_DIRECTORY, 'bahamut-comment-enhancer.user.js');
 
-  var source = [createUserscriptHeader(metadata, manifest.version)];
-  getContentScriptPaths().forEach(function (relativePath) {
-    source.push(fs.readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8'));
-  });
+  var source = [createUserscriptHeader(metadata, manifest.version, recommendedSettings)];
+  for (var index = 0; index < getContentScriptPaths().length; index += 1) {
+    var relativePath = getContentScriptPaths()[index];
+    source.push(await minifyJavaScript(fs.readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8'), relativePath));
+  }
   fs.writeFileSync(scriptPath, source.join('\n\n'), 'utf8');
   return scriptPath;
 }
@@ -190,37 +235,40 @@ function createZip(entries) {
 function packageExtension(target, sourceDirectory) {
   var entries = [];
   collectFiles(sourceDirectory, '', entries);
-  var outputPath = path.join(PROJECT_ROOT, 'dist', 'bahamut-comment-enhancer-' + target + '-' + getManifest(target).version + '.zip');
+  var outputPath = path.join(DIST_DIRECTORY, 'bahamut-comment-enhancer-' + target + '-' + getManifest(target).version + '.zip');
   fs.writeFileSync(outputPath, createZip(entries));
   return outputPath;
 }
 
-function buildTarget(target, shouldPackage) {
+async function buildTarget(target, shouldPackage) {
   if (target === 'tampermonkey') {
-    console.log('已建立 Tampermonkey userscript：' + path.relative(PROJECT_ROOT, buildUserscript()));
+    console.log('已建立 Tampermonkey userscript：' + path.relative(PROJECT_ROOT, await buildUserscript()));
     return;
   }
-  var outputPath = buildExtension(target);
-  console.log('已建立 ' + target + ' 擴充功能：' + path.relative(PROJECT_ROOT, outputPath));
+  var outputPath = await buildExtension(target);
   if (shouldPackage) {
     console.log('已建立發佈 ZIP：' + path.relative(PROJECT_ROOT, packageExtension(target, outputPath)));
   }
 }
 
-function main() {
+async function main() {
   var target = process.argv[2];
   var shouldPackage = process.argv.indexOf('--package') !== -1;
   if (!target || (TARGETS.indexOf(target) === -1 && target !== 'all')) {
     throw new Error('請指定目標：chrome、firefox、edge、tampermonkey 或 all。');
   }
-  (target === 'all' ? TARGETS : [target]).forEach(function (nextTarget) {
-    buildTarget(nextTarget, shouldPackage);
-  });
+  // 先確認壓縮器可用，避免依賴未安裝時清掉既有發佈檔。
+  getTerser();
+  cleanDirectory(DIST_DIRECTORY);
+  var targets = target === 'all' ? TARGETS : [target];
+  for (var index = 0; index < targets.length; index += 1) {
+    await buildTarget(targets[index], shouldPackage);
+  }
 }
 
-try {
-  main();
-} catch (error) {
+main().catch(function (error) {
   console.error('建置失敗：' + error.message);
   process.exitCode = 1;
-}
+}).finally(function () {
+  fs.rmSync(TEMP_DIRECTORY, { recursive: true, force: true });
+});

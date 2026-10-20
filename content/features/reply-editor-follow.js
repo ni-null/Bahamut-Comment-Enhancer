@@ -6,17 +6,22 @@
   'use strict';
 
   var tools = window.BahamutCommentTools;
-  var MIRROR_ATTRIBUTE = 'data-comment-thread-reply-editor-mirror';
   var MIRROR_CLASS = 'comment-thread-reply-editor-mirror';
   var STYLE_ID = 'comment-thread-reply-editor-follow-styles';
+  var SOURCE_SYNC_INTERVAL = 100;
+  var PAGE_KEYPRESS_REQUEST_EVENT = 'bahamut-comment-reply-keypress-request';
   var states = new WeakMap();
   var clickListenerInstalled = false;
+  var sourceSequence = 0;
 
   function addStyles() {
     if (document.getElementById(STYLE_ID)) return;
     var style = document.createElement('style');
     style.id = STYLE_ID;
-    style.textContent = '.' + MIRROR_CLASS + ' { clear: both; width: 100%; margin-top: 8px; }';
+    style.textContent = [
+      '.' + MIRROR_CLASS + ' { clear: both; width: 100%; margin-top: 8px; }',
+      '.' + MIRROR_CLASS + ' textarea { overflow-y: hidden; }'
+    ].join('\n');
     document.head.appendChild(style);
   }
 
@@ -43,8 +48,14 @@
   }
 
   function syncControls(source, mirror) {
-    var sourceControls = source.querySelectorAll('input, textarea, select');
-    var mirrorControls = mirror.querySelectorAll('input, textarea, select');
+    // 標記強化會在原始 editor 動態加入搜尋欄位；textarea 必須獨立同步，
+    // 不可再依所有表單控制項的索引配對，否則欄位數不同時會錯位。
+    var sourceTextarea = getTextarea(source);
+    var mirrorTextarea = getTextarea(mirror);
+    if (sourceTextarea && mirrorTextarea) mirrorTextarea.value = sourceTextarea.value;
+
+    var sourceControls = source.querySelectorAll('input, select');
+    var mirrorControls = mirror.querySelectorAll('input, select');
     Array.prototype.forEach.call(mirrorControls, function (control, index) {
       var original = sourceControls[index];
       if (!original) return;
@@ -53,27 +64,101 @@
     });
   }
 
+  function resizeMirrorTextarea(textarea) {
+    if (!textarea) return;
+    // 先清除既有高度取得正確 scrollHeight，再依內容撐高；不影響官方底部輸入框。
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.max(textarea.scrollHeight, 20) + 'px';
+  }
+
   function forwardControlClick(state, mirrorControl) {
     var mirrorControls = Array.prototype.slice.call(state.mirror.querySelectorAll('button, a, input, select'));
     var sourceControls = state.source.querySelectorAll('button, a, input, select');
     var index = mirrorControls.indexOf(mirrorControl);
     var sourceControl = index === -1 ? null : sourceControls[index];
-    if (sourceControl && typeof sourceControl.click === 'function') sourceControl.click();
+    if (sourceControl) {
+      var href = sourceControl.getAttribute && sourceControl.getAttribute('href');
+      if (sourceControl.tagName === 'A' && /^\s*javascript:/i.test(href || '')) {
+        // 轉送事件給論壇既有 listener，但取消 javascript: URL 的預設導向；
+        // 直接呼叫 .click() 會被網站 CSP 視為執行 inline JavaScript 而封鎖。
+        var preventJavascriptNavigation = function (event) { event.preventDefault(); };
+        sourceControl.addEventListener('click', preventJavascriptNavigation, true);
+        sourceControl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+        sourceControl.removeEventListener('click', preventJavascriptNavigation, true);
+      } else if (typeof sourceControl.click === 'function') {
+        sourceControl.click();
+      }
+    }
     window.requestAnimationFrame(function () {
       if (state.mirror && state.source) syncControls(state.source, state.mirror);
     });
+  }
+
+  function syncFromSource(state, force) {
+    var sourceTextarea = getTextarea(state && state.source);
+    var mirrorTextarea = getTextarea(state && state.mirror);
+    if (!sourceTextarea || !mirrorTextarea) return;
+    if (!force && state.lastSourceValue === sourceTextarea.value) return;
+
+    state.lastSourceValue = sourceTextarea.value;
+    syncControls(state.source, state.mirror);
+    resizeMirrorTextarea(mirrorTextarea);
+    // 讓鏡像的標記預覽立即重繪；同步旗標避免回寫到底部 editor 形成迴圈。
+    state.isSyncing = true;
+    mirrorTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+    state.isSyncing = false;
+    // 官方可能直接指定 textarea.value 而不派送 input；這裡也要檢查目標標記是否已被移除。
+    if (state.marker && sourceTextarea.value.indexOf(state.marker) === -1) removeMirror(state);
+  }
+
+  function startSourceSync(state) {
+    if (!state || state.syncTimer) return;
+    state.lastSourceValue = getTextarea(state.source) ? getTextarea(state.source).value : '';
+    // 僅在鏡像存在時監聽，處理論壇直接寫入 value 而未觸發 input 的情況。
+    state.syncTimer = window.setInterval(function () { syncFromSource(state, false); }, SOURCE_SYNC_INTERVAL);
+  }
+
+  function requestPageKeypress(state, event) {
+    if (!state || !state.sourceToken) return;
+    document.dispatchEvent(new CustomEvent(PAGE_KEYPRESS_REQUEST_EVENT, {
+      detail: JSON.stringify({
+        sourceToken: state.sourceToken,
+        key: event.key,
+        code: event.code,
+        location: event.location,
+        ctrlKey: event.ctrlKey,
+        altKey: event.altKey,
+        shiftKey: event.shiftKey,
+        metaKey: event.metaKey,
+        repeat: event.repeat
+      })
+    }));
   }
 
   function bindMirror(state) {
     var sourceTextarea = getTextarea(state.source);
     var mirrorTextarea = getTextarea(state.mirror);
     if (sourceTextarea && mirrorTextarea) {
-      sourceTextarea.addEventListener('input', function () {
-        mirrorTextarea.value = sourceTextarea.value;
-      });
+      if (state.sourceInputHandler) sourceTextarea.removeEventListener('input', state.sourceInputHandler);
+      state.sourceInputHandler = function () {
+        syncFromSource(state, true);
+      };
+      sourceTextarea.addEventListener('input', state.sourceInputHandler);
       mirrorTextarea.addEventListener('input', function () {
+        if (state.isSyncing) return;
+        resizeMirrorTextarea(mirrorTextarea);
         sourceTextarea.value = mirrorTextarea.value;
         sourceTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      mirrorTextarea.addEventListener('keypress', function (event) {
+        // 論壇的 initCommentInput() 正是在 keypress 用 which/keyCode === 13 呼叫 G() 送出。
+        var keyCode = event.which || event.keyCode || (event.key === 'Enter' ? 13 : 0);
+        if (keyCode !== 13 || event.isComposing) return;
+        sourceTextarea.value = mirrorTextarea.value;
+        sourceTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        requestPageKeypress(state, event);
+        // 與官方 handler 相同：Enter 一律不在 textarea 內插入換行。
+        event.preventDefault();
       });
     }
 
@@ -88,9 +173,23 @@
 
   function removeMirror(state) {
     if (!state) return;
+    var sourceTextarea = getTextarea(state.source);
+    if (sourceTextarea && state.sourceToken &&
+      sourceTextarea.getAttribute('data-comment-thread-reply-source-token') === state.sourceToken) {
+      sourceTextarea.removeAttribute('data-comment-thread-reply-source-token');
+    }
+    if (sourceTextarea && state.sourceInputHandler) {
+      sourceTextarea.removeEventListener('input', state.sourceInputHandler);
+    }
+    state.sourceInputHandler = null;
+    state.sourceToken = '';
+    if (state.syncTimer) window.clearInterval(state.syncTimer);
+    state.syncTimer = null;
+    state.lastSourceValue = null;
     if (state.mirror) state.mirror.remove();
     state.mirror = null;
     state.targetItem = null;
+    state.marker = '';
   }
 
   function focusMirror(state) {
@@ -130,20 +229,29 @@
 
     removeMirror(state);
     state.source = source;
+    state.marker = marker;
+    state.sourceToken = 'reply-source-' + Date.now() + '-' + (++sourceSequence);
+    var sourceTextarea = getTextarea(source);
+    if (sourceTextarea) sourceTextarea.setAttribute('data-comment-thread-reply-source-token', state.sourceToken);
     setCurrentReplyMarker(source, marker);
 
     var wrapper = document.createElement('div');
     wrapper.className = MIRROR_CLASS;
     var mirror = source.cloneNode(true);
-    mirror.setAttribute(MIRROR_ATTRIBUTE, 'true');
     removeIds(mirror);
+    // source token 僅供 MAIN world 定位官方原始 textarea，不能隨 clone 複製到鏡像。
+    Array.prototype.forEach.call(mirror.querySelectorAll('[data-comment-thread-reply-source-token]'), function (element) {
+      element.removeAttribute('data-comment-thread-reply-source-token');
+    });
     wrapper.appendChild(mirror);
     footer.appendChild(wrapper);
 
     state.mirror = wrapper;
     state.targetItem = item;
     syncControls(source, wrapper);
+    resizeMirrorTextarea(getTextarea(wrapper));
     bindMirror(state);
+    startSourceSync(state);
     focusMirror(state);
     // 官方回覆流程會定位到原始 editor；鏡像模式維持使用者原本正在閱讀的位置。
     restoreScrollPosition(scrollPosition);
@@ -195,12 +303,30 @@
 
     addStyles();
     if (!state) {
-      state = { host: host, source: null, mirror: null, targetItem: null, token: 0 };
+      state = {
+        host: host,
+        source: null,
+        mirror: null,
+        targetItem: null,
+        marker: '',
+        sourceInputHandler: null,
+        sourceToken: '',
+        isSyncing: false,
+        syncTimer: null,
+        lastSourceValue: null,
+        token: 0
+      };
       states.set(host, state);
     }
     installClickListener();
   }
 
+  function dismiss(host) {
+    // 供其他獨立留言操作取消目前鏡像，並同時停止同步計時器與事件監聽。
+    var state = states.get(host);
+    if (state) removeMirror(state);
+  }
+
   tools.features = tools.features || {};
-  tools.features.replyEditorFollow = { apply: apply };
+  tools.features.replyEditorFollow = { apply: apply, dismiss: dismiss };
 })(window, document);

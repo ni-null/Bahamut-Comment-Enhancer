@@ -89,7 +89,7 @@
       '  margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(127,127,127,.25);',
       '}',
       '.' + CONTROL_MENU_CLASS + '__actions-row { display: flex; gap: 6px; }',
-      '.' + CONTROL_MENU_CLASS + '__reset {',
+      '.' + CONTROL_MENU_CLASS + '__reset, .' + CONTROL_MENU_CLASS + '__recommend {',
       '  display: inline-flex; align-items: center; justify-content: center; gap: 5px;',
       '  flex: 1 1 auto; min-height: 30px; border: 1px solid rgba(127,127,127,.55);',
       '  border-radius: 4px; background: transparent; color: inherit; cursor: pointer;',
@@ -100,8 +100,8 @@
       '  border-radius: 4px; background: transparent; color: inherit; cursor: pointer;',
       '}',
       '.' + CONTROL_MENU_CLASS + '__info > .material-icons { font-size: 18px; }',
-      '.' + CONTROL_MENU_CLASS + '__reset:hover,',
-      '.' + CONTROL_MENU_CLASS + '__reset:focus-visible {',
+      '.' + CONTROL_MENU_CLASS + '__reset:hover, .' + CONTROL_MENU_CLASS + '__recommend:hover,',
+      '.' + CONTROL_MENU_CLASS + '__reset:focus-visible, .' + CONTROL_MENU_CLASS + '__recommend:focus-visible {',
       '  border-color: #117e96; background: rgba(17,126,150,.1); color: #117e96;',
       '  outline: none;',
       '}',
@@ -182,11 +182,20 @@
     return icon;
   }
 
-  function createActions(onReset) {
+  function createActions(onReset, onRecommend) {
     var actions = document.createElement('div');
     actions.className = CONTROL_MENU_CLASS + '__actions';
     var row = document.createElement('div');
     row.className = CONTROL_MENU_CLASS + '__actions-row';
+
+    var recommendButton = document.createElement('button');
+    recommendButton.type = 'button';
+    recommendButton.className = CONTROL_MENU_CLASS + '__recommend';
+    recommendButton.title = '套用推薦設定';
+    recommendButton.appendChild(createMaterialIcon('recommend'));
+    recommendButton.appendChild(document.createTextNode('推薦設定'));
+    recommendButton.addEventListener('click', onRecommend);
+    row.appendChild(recommendButton);
 
     var resetButton = document.createElement('button');
     resetButton.type = 'button';
@@ -318,6 +327,7 @@
     commentGroup.appendChild(createMenuToggle('摺疊留言底欄', 'footerInteractionCollapseEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('回覆框跟隨留言', 'replyEditorFollowEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('標記強化', 'replyAnnotationPreviewEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createMenuToggle('顯示標記', 'quickMarkerButtonsEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('推噓移至右側', 'reactionInlineEnabled', state, options.onSettingChange));
 
     var displayGroup = document.createElement('div');
@@ -338,6 +348,7 @@
       { value: 'default', label: '預設時間' },
       { value: 'relative', label: '相對時間' }
     ], state, options.onSettingChange));
+    displayGroup.appendChild(createMenuToggle('隱藏 HOT 標籤', 'hideHotTagEnabled', state, options.onSettingChange));
 
     var imageGroup = document.createElement('div');
     imageGroup.className = CONTROL_MENU_CLASS + '__group';
@@ -351,7 +362,7 @@
     layout.appendChild(displayGroup);
     layout.appendChild(imageGroup);
     menu.appendChild(layout);
-    menu.appendChild(createActions(options.onReset));
+    menu.appendChild(createActions(options.onReset, options.onRecommend));
 
     controls.appendChild(gear);
     controls.appendChild(menu);

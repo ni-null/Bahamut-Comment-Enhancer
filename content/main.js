@@ -12,7 +12,9 @@
   var avatar = tools.features.avatar;
   var floorAvatar = tools.features.floorAvatar;
   var imagePreview = tools.features.imagePreview;
+  var imageLightbox = tools.features.imageLightbox;
   var youtubeLightbox = tools.features.youtubeLightbox;
+  var commentAreaHeight = tools.features.commentAreaHeight;
   var relativeTime = tools.features.relativeTime;
   var footerCollapse = tools.features.footerCollapse;
   var replyEditorFollow = tools.features.replyEditorFollow;
@@ -38,8 +40,7 @@
     var effectiveState = getEffectiveState();
     return effectiveState.threadingEnabled || effectiveState.userNameAtBottomEnabled ||
       effectiveState.avatarDisplay !== 'default' || effectiveState.imageSmallPreviewEnabled ||
-      effectiveState.imageHoverPreviewEnabled || effectiveState.youtubeLightboxEnabled ||
-      effectiveState.timeDisplay !== 'default' ||
+      effectiveState.imageHoverPreviewEnabled || effectiveState.timeDisplay !== 'default' ||
       effectiveState.footerInteractionCollapseEnabled || effectiveState.floorAtAvatarEnabled ||
       effectiveState.reactionInlineEnabled || effectiveState.markerEnhancementEnabled ||
       effectiveState.avatarShape !== 'round' || effectiveState.commentSortMode !== 'default' ||
@@ -154,7 +155,9 @@
       avatar.apply(list, effectiveState.avatarDisplay, effectiveState.avatarShape);
       floorAvatar.apply(list, effectiveState.floorAtAvatarEnabled);
       imagePreview.apply(list, effectiveState.imageSmallPreviewEnabled, effectiveState.imageHoverPreviewEnabled);
+      imageLightbox.apply(list, effectiveState.imageLightboxEnabled);
       youtubeLightbox.apply(list, effectiveState.youtubeLightboxEnabled);
+      commentAreaHeight.apply(list, effectiveState.commentAreaHeightMode, effectiveState.commentAreaCustomHeight);
       relativeTime.apply(list, effectiveState.timeDisplay);
       footerCollapse.apply(list, effectiveState.footerInteractionCollapseEnabled);
       replyEditorFollow.apply(list, effectiveState.replyEditorFollowEnabled);
@@ -241,7 +244,9 @@
     userNameFooter.restore(list);
     avatar.apply(list, 'default', 'round');
     imagePreview.apply(list, false, false);
+    imageLightbox.apply(list, false);
     youtubeLightbox.apply(list, false);
+    commentAreaHeight.restore(list);
     relativeTime.apply(list, 'default');
     footerCollapse.apply(list, false);
     replyEditorFollow.apply(list, false);

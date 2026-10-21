@@ -17,7 +17,10 @@
     avatarShape: 'round',
     imageSmallPreviewEnabled: false,
     imageHoverPreviewEnabled: false,
+    imageLightboxEnabled: true,
     youtubeLightboxEnabled: true,
+    commentAreaHeightMode: 'unlimited',
+    commentAreaCustomHeight: 600,
     timeDisplay: 'default',
     footerInteractionCollapseEnabled: false,
     replyEditorFollowEnabled: false,
@@ -57,9 +60,18 @@
       imageHoverPreviewEnabled: value && typeof value.imageHoverPreviewEnabled === 'boolean'
         ? value.imageHoverPreviewEnabled
         : DEFAULTS.imageHoverPreviewEnabled,
+      imageLightboxEnabled: value && typeof value.imageLightboxEnabled === 'boolean'
+        ? value.imageLightboxEnabled
+        : DEFAULTS.imageLightboxEnabled,
       youtubeLightboxEnabled: value && typeof value.youtubeLightboxEnabled === 'boolean'
         ? value.youtubeLightboxEnabled
         : DEFAULTS.youtubeLightboxEnabled,
+      commentAreaHeightMode: value && ['unlimited', 'compact', 'large', 'custom'].indexOf(value.commentAreaHeightMode) !== -1
+        ? value.commentAreaHeightMode
+        : DEFAULTS.commentAreaHeightMode,
+      commentAreaCustomHeight: value && Number.isFinite(value.commentAreaCustomHeight)
+        ? Math.max(120, Math.min(5000, Math.round(value.commentAreaCustomHeight)))
+        : DEFAULTS.commentAreaCustomHeight,
       timeDisplay: value && ['default', 'full', 'relative'].indexOf(value.timeDisplay) !== -1
         ? value.timeDisplay
         : DEFAULTS.timeDisplay,

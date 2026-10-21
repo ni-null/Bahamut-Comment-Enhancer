@@ -24,8 +24,14 @@
       collapseThreadingEnabled: true,
       // 區塊化主題會將跟隨的回覆框排在互動列下方。
       replyEditorFollowEnabled: true,
+      // 自訂圖片燈箱：區塊化留言也使用頁面內圖片預覽。
+      imageLightboxEnabled: true,
       // YouTube 燈箱播放：區塊化留言也沿用頁面內影片播放。
-      youtubeLightboxEnabled: true
+      youtubeLightboxEnabled: true,
+      // 留言區高度：區塊化主題預設不限制外層留言區高度。
+      commentAreaHeightMode: 'unlimited',
+      // 留言區自訂高度：選擇自訂時預設為 600px。
+      commentAreaCustomHeight: 600
     }
   });
   var STYLE_ID = 'comment-thread-block-comment-style';
@@ -40,8 +46,8 @@
     var style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
-      '.c-post__footer.c-reply[' + HOST_ATTRIBUTE + '="' + STYLE_NAME + '"] { padding: 10px; }',
-      SCOPE + ' { --comment-thread-block-border: rgba(88, 112, 112, .2); --comment-thread-block-muted: #718080; --comment-thread-block-accent: #117e96; }',
+      // 區塊化主題：內距加在 Commendlist，避免影響外層控制列與留言輸入框。
+      SCOPE + ' { padding: 10px; --comment-thread-block-border: rgba(88, 112, 112, .2); --comment-thread-block-muted: #718080; --comment-thread-block-accent: #117e96; }',
       SCOPE + ' > .c-reply__item,',
       // 階層留言：收合動畫在子容器加上 inner 包裝層，二、三級留言卡片需套用至該層的直屬項目。
       SCOPE + ' .comment-thread-children > .comment-thread-children__inner > .c-reply__item {',

@@ -46,7 +46,9 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/avatar.js` | 控制留言頭像顯示方式與圓形／方形樣式 | 選單、設定讀寫、AJAX observer |
 | `content/features/floor-avatar.js` | 懸停頭像時以樓層數字覆蓋圖片，並相容還原舊版樓層徽章 | 選單、設定讀寫、頭像顯示模式 |
 | `content/features/image-preview.js` | 控制留言內文圖片縮小預覽與 Hover 時模擬原圖點擊 | 選單、設定讀寫、圖片放大器實作 |
+| `content/features/image-lightbox.js` | 以自訂燈箱取代官方 Photoswipe 圖片預覽，支援點擊關閉與滾輪縮放 | 選單、設定讀寫、官方圖片燈箱 |
 | `content/features/youtube-lightbox.js` | 將官方 YouTube 影片連結以燈箱 iframe 播放；關閉時卸載播放器 | 選單、設定讀寫、AJAX observer |
+| `content/features/comment-area-height.js` | 限制 `Commendlist` 留言清單高度並顯示淡化垂直捲軸；保留原始 inline style 以便還原 | 選單、設定讀寫、留言內容 |
 | `content/features/relative-time.js` | 在預設、完整與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
 | `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將同一個官方 editor 節點搬到該留言 footer 下方；原位置保留可點擊的回復列，點擊即可搬回底部，因此完全沿用官方 Enter、按鈕與事件 | 回覆內容、官方回覆函式、其他留言功能 |
@@ -79,6 +81,10 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
   "avatarShape": "round",
   "imageSmallPreviewEnabled": false,
   "imageHoverPreviewEnabled": false,
+  "imageLightboxEnabled": true,
+  "youtubeLightboxEnabled": true,
+  "commentAreaHeightMode": "unlimited",
+  "commentAreaCustomHeight": 600,
   "timeDisplay": "default",
   "footerInteractionCollapseEnabled": false,
   "replyEditorFollowEnabled": false,
@@ -123,6 +129,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 顯示 | `頭像樣式`右側設定按鈕 | 展開專用設定後，可調整頭像大小、圓形／方形與停懸顯示樓層；停懸時以 `name="comment_floor"` 的樓層數字覆蓋頭像，footer 的原始樓層仍維持顯示。 |
 | 顯示 | `時間顯示` | `預設時間`、`完整時間`（由 `data-tippy-content` 取出秒級時間）或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。 |
 | 顯示 | `隱藏 HOT 標籤` | 隱藏官方留言上的 `HOT` 標籤；關閉後立即還原。 |
+| 顯示 | `留言區高度` | 限制 `#Commendlist_*` 的最大高度，可選不限制、480px、720px 或自訂 120–5000px；內容超出時顯示垂直捲軸與 10px 內距。若有官方 `.c-reply__head`，外掛控制列會直接附加其中；否則附加於外層留言容器。 |
 | 主選單頂部 | `主題` | 可選擇`預設`或`區塊化`。每個主題可宣告衝突設定清單；衝突控制項會隱藏，原本偏好會保留，切換主題後自動恢復。 |
 | 顯示 | `收合底欄` | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。 |
 | 留言與排序 | `回覆框跟隨留言` | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著把同一個官方 `.c-reply__editor` 節點搬到該則 `.reply-content__footer` 最下方，原位置保留「回到底部留言框」列。點擊該列、關閉功能或改用多樓層標記時會立即還原，無輸入框複製或同步。 |
@@ -130,6 +137,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 留言與排序 | `推噓移至右側` | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。 |
 | 圖片 | `縮小預覽` | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。 |
 | 圖片 | `Hover 顯示` | 圖片區塊下的二級選項；游標持續停留 0.5 秒後才模擬原圖的 click，提前移開會取消，沿用論壇既有的圖片放大效果。 |
+| 圖片 | `自訂圖片燈箱` | 攔截官方 `.photoswipe-image`，以自訂燈箱顯示沒有 `w` 寬度限制的圖片網址；點圖片或遮罩即可關閉，滾輪可在 25% 至 800% 間縮放。修飾鍵與中鍵仍保留另開原圖。 |
 | 圖片 | `YouTube 燈箱播放` | 攔截官方產生的 YouTube 影片預覽連結，在頁面燈箱中以 `youtube-nocookie.com` iframe 播放；Esc、關閉按鈕或點擊遮罩時會立即卸載播放器。Ctrl／Cmd／Shift／Alt 與中鍵點擊仍會依原連結另開分頁。 |
 | 動作 | `還原預設` | 套用並儲存 `content/features/comment-styles/default.js` 所宣告的預設主題設定。 |
 | 動作 | `info` 圖示 | 開啟可由關閉按鈕、遮罩或 Esc 關閉的 Modal，顯示目前版本、Manifest V3 開發資訊與功能簡介。 |

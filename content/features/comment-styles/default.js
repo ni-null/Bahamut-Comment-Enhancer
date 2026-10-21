@@ -30,8 +30,14 @@
       imageSmallPreviewEnabled: false,
       // 圖片 Hover 顯示：預設不以停懸開啟圖片。
       imageHoverPreviewEnabled: false,
+      // 自訂圖片燈箱：預設以頁面內圖片燈箱取代官方預覽。
+      imageLightboxEnabled: true,
       // YouTube 燈箱播放：預設直接在留言頁面開啟官方影片。
       youtubeLightboxEnabled: true,
+      // 留言區高度：預設不限制外層留言區高度。
+      commentAreaHeightMode: 'unlimited',
+      // 留言區自訂高度：選擇自訂時預設為 600px。
+      commentAreaCustomHeight: 600,
       // 時間顯示：預設使用相對時間。
       timeDisplay: 'relative',
       // 收合底欄：預設完整顯示互動列。

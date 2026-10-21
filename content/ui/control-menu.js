@@ -18,17 +18,18 @@
     style.id = 'comment-thread-controls-styles';
     style.textContent = [
       '.comment-thread-controls-host { position: relative; }',
-      '.comment-thread-controls-host > .' + CONTROL_BAR_CLASS + ' {',
+      '.comment-thread-controls-host > .' + CONTROL_BAR_CLASS + ',',
+      '.comment-thread-controls-host > .c-reply__head > .' + CONTROL_BAR_CLASS + ' {',
       '  position: absolute; z-index: 11; top: 8px; right: 8px; display: inline-flex;',
       '}',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ' {',
-      '  border: 0; padding: 2px 4px; background: none; color: inherit;',
+      '  border: 0; padding: 0; background: none; color: inherit;',
       '  cursor: pointer; line-height: 1; opacity: .55;',
       '}',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ':hover,',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ':focus-visible,',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + '[aria-expanded="true"] { opacity: 1; }',
-      '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ' > .material-icons { font-size: 18px; padding-top: 5px; }',
+      '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ' > .material-icons { display: block; font-size: 18px; padding: 0; }',
       '.' + CONTROL_MENU_CLASS + ' {',
       '  position: absolute; z-index: 10; top: calc(100% + 4px); right: 0;',
       '  width: min(412px, calc(100vw - 24px)); padding: 10px; border: 1px solid rgba(127,127,127,.45);',
@@ -126,7 +127,12 @@
       '  min-width: 76px; border: 1px solid rgba(127,127,127,.55); border-radius: 4px;',
       '  padding: 3px 5px; background: Canvas; color: CanvasText;',
       '}',
+      '.' + CONTROL_MENU_CLASS + '__number {',
+      '  width: 82px; border: 1px solid rgba(127,127,127,.55); border-radius: 4px;',
+      '  padding: 3px 5px; background: Canvas; color: CanvasText;',
+      '}',
       '.' + CONTROL_MENU_CLASS + '__select:focus { border-color: #117e96; outline: 2px solid rgba(17,126,150,.3); }',
+      '.' + CONTROL_MENU_CLASS + '__number:focus { border-color: #117e96; outline: 2px solid rgba(17,126,150,.3); }',
       '.' + CONTROL_MENU_CLASS + '__actions {',
       '  margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(127,127,127,.25);',
       '}',
@@ -292,6 +298,28 @@
     return label;
   }
 
+  function createMenuNumber(labelText, settingName, state, onSettingChange, config) {
+    config = config || {};
+    var label = document.createElement('label');
+    label.className = CONTROL_MENU_CLASS + '__item' + (config.secondary ? ' ' + CONTROL_MENU_CLASS + '__subitem' : '');
+    if (config.visibleWhen) label.dataset.commentThreadVisibleWhen = config.visibleWhen.setting + ':' + config.visibleWhen.value;
+    label.appendChild(document.createTextNode(labelText));
+
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.className = CONTROL_MENU_CLASS + '__number';
+    input.dataset.commentThreadSetting = settingName;
+    input.min = String(config.min || 1);
+    input.max = String(config.max || 9999);
+    input.step = String(config.step || 1);
+    input.value = String(state[settingName]);
+    input.addEventListener('change', function () {
+      onSettingChange(settingName, Number(input.value));
+    });
+    label.appendChild(input);
+    return label;
+  }
+
   function createGroupTitle(titleText) {
     var title = document.createElement('div');
     title.className = CONTROL_MENU_CLASS + '__group-title';
@@ -384,9 +412,34 @@
   }
 
   function getDirectControls(host) {
-    return Array.prototype.find.call(host.children, function (child) {
+    var controls = Array.prototype.find.call(host.children, function (child) {
       return child.classList.contains(CONTROL_BAR_CLASS);
     });
+    if (controls) return controls;
+    var replyHead = Array.prototype.find.call(host.children, function (child) {
+      return child.matches('.c-reply__head');
+    });
+    return replyHead && Array.prototype.find.call(replyHead.children, function (child) {
+      return child.classList.contains(CONTROL_BAR_CLASS);
+    });
+  }
+
+  function removeLegacyControlsHeader(host) {
+    var legacyHeader = Array.prototype.find.call(host.children, function (child) {
+      return child.classList.contains('comment-thread-controls-header');
+    });
+    if (!legacyHeader) return;
+    var replyHead = Array.prototype.find.call(legacyHeader.children, function (child) {
+      return child.matches('.c-reply__head');
+    });
+    if (replyHead) host.insertBefore(replyHead, legacyHeader);
+    legacyHeader.remove();
+  }
+
+  function getControlsTarget(host) {
+    return Array.prototype.find.call(host.children, function (child) {
+      return child.matches('.c-reply__head');
+    }) || host;
   }
 
   function createValidationMessage(reason) {
@@ -411,6 +464,8 @@
     host.classList.add('comment-thread-controls-host');
     var existingControls = getDirectControls(host);
     if (existingControls) existingControls.remove();
+    removeLegacyControlsHeader(host);
+    var controlsTarget = getControlsTarget(host);
     var isValid = !options.validation || options.validation.valid;
     var state = isValid ? options.getState() : null;
     var controls = document.createElement('div');
@@ -432,7 +487,7 @@
       menu.appendChild(createValidationMessage(options.validation.reason));
       controls.appendChild(gear);
       controls.appendChild(menu);
-      host.appendChild(controls);
+      controlsTarget.appendChild(controls);
       installOutsideMenuClose();
       gear.addEventListener('click', function () {
         var shouldOpen = menu.hidden;
@@ -468,12 +523,25 @@
     ], state, options.onSettingChange));
     displayGroup.appendChild(createMenuToggle('隱藏 HOT 標籤', 'hideHotTagEnabled', state, options.onSettingChange));
     displayGroup.appendChild(createMenuToggle('推噓移至右側', 'reactionInlineEnabled', state, options.onSettingChange));
+    displayGroup.appendChild(createMenuSelect('留言區高度', 'commentAreaHeightMode', [
+      { value: 'unlimited', label: '不限制' },
+      { value: 'compact', label: '480px' },
+      { value: 'large', label: '720px' },
+      { value: 'custom', label: '自訂高度' }
+    ], state, options.onSettingChange));
+    displayGroup.appendChild(createMenuNumber('自訂高度 (px)', 'commentAreaCustomHeight', state, options.onSettingChange, {
+      min: 120,
+      max: 5000,
+      step: 10,
+      visibleWhen: { setting: 'commentAreaHeightMode', value: 'custom' }
+    }));
 
     var imageGroup = document.createElement('div');
     imageGroup.className = CONTROL_MENU_CLASS + '__group';
     imageGroup.appendChild(createGroupTitle('圖片'));
     imageGroup.appendChild(createMenuToggle('縮小預覽', 'imageSmallPreviewEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('停懸顯示', 'imageHoverPreviewEnabled', state, options.onSettingChange, { secondary: true }));
+    imageGroup.appendChild(createMenuToggle('自訂圖片燈箱', 'imageLightboxEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('YouTube 燈箱播放', 'youtubeLightboxEnabled', state, options.onSettingChange, { secondary: true }));
 
     var layout = document.createElement('div');
@@ -495,7 +563,7 @@
 
     controls.appendChild(gear);
     controls.appendChild(menu);
-    host.appendChild(controls);
+    controlsTarget.appendChild(controls);
     installOutsideMenuClose();
     gear.addEventListener('click', function () {
       var shouldOpen = menu.hidden;
@@ -532,6 +600,20 @@
       selectLabel.classList.toggle('is-hidden', disabledByStyle);
       selectLabel.classList.toggle('is-disabled', false);
       selectLabel.title = '';
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__number'), function (input) {
+      input.value = String(state[input.dataset.commentThreadSetting]);
+      var disabledByStyle = disabledSettings.indexOf(input.dataset.commentThreadSetting) !== -1;
+      input.disabled = disabledByStyle;
+      var numberLabel = input.closest('label');
+      numberLabel.classList.toggle('is-hidden', disabledByStyle);
+      numberLabel.classList.toggle('is-disabled', false);
+      numberLabel.title = '';
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('label[data-comment-thread-visible-when]'), function (label) {
+      var rule = label.dataset.commentThreadVisibleWhen.split(':');
+      var isVisible = state[rule[0]] === rule[1];
+      label.classList.toggle('is-hidden', !isVisible || disabledSettings.indexOf(label.querySelector('[data-comment-thread-setting]').dataset.commentThreadSetting) !== -1);
     });
   }
 

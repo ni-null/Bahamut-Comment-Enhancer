@@ -35,7 +35,11 @@
       return validation;
     }
 
-    var hasExpandedHeader = Boolean(getDirectChild(host, '.c-reply__head.nocontent'));
+    var legacyControlsHeader = getDirectChild(host, '.comment-thread-controls-header');
+    var hasExpandedHeader = Boolean(
+      getDirectChild(host, '.c-reply__head.nocontent') ||
+      (legacyControlsHeader && getDirectChild(legacyControlsHeader, '.c-reply__head.nocontent'))
+    );
     var hasReplyEditor = Boolean(getDirectChild(host, '.c-reply__editor'));
     if (!hasExpandedHeader && !hasReplyEditor) {
       validation.reason = '找不到展開留言標頭或留言輸入區。';

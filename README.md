@@ -1,6 +1,7 @@
 # 巴哈留言優化工具
 
 > 讓巴哈姆特論壇留言更容易閱讀、整理與互動的瀏覽器擴充功能與 Userscript。
+ <img width="1400" height="560" alt="c9d7cfe6a356fb6951fb3fedde1bddb2" src="https://github.com/user-attachments/assets/1768807e-0edd-4009-865c-4a16ec822299" />
 
 ## 介紹
 

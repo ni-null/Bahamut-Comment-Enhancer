@@ -20,7 +20,7 @@
       '.reply-content[' + STATE_ATTRIBUTE + '="true"] { position: relative; padding-right: 76px !important; }',
       '.reply-content > .' + TRAY_CLASS + ' {',
       '  position: absolute; top: 1px; right: 0; display: inline-flex; align-items: center;',
-      '  min-height: 24px; white-space: nowrap; z-index: 1;',
+      '  min-height: 24px; white-space: nowrap; z-index: 2;',
       '}',
       '.reply-content > .' + TRAY_CLASS + ' > button,',
       '.reply-content > .' + TRAY_CLASS + ' > a { flex: 0 0 auto; }',

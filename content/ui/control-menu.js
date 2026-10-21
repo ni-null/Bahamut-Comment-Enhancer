@@ -41,6 +41,11 @@
       '.' + CONTROL_MENU_CLASS + '__layout {',
       '  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px;',
       '}',
+      '.' + CONTROL_MENU_CLASS + '__theme {',
+      '  display: flex; align-items: center; justify-content: space-between; min-height: 38px; gap: 12px; margin-bottom: 10px; padding: 5px 8px;',
+      '  border: 1px solid rgba(17,126,150,.3); border-radius: 5px; background: rgba(17,126,150,.06); color: #117e96; font-weight: 600;',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__theme > .' + CONTROL_MENU_CLASS + '__select { min-width: 132px; color: CanvasText; font-weight: 400; }',
       '.' + CONTROL_MENU_CLASS + '__group {',
       '  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 10px;',
       '  padding: 8px; border: 1px solid rgba(127,127,127,.22);',
@@ -54,6 +59,42 @@
       '  display: flex; align-items: center; justify-content: space-between;',
       '  min-height: 28px; gap: 12px; padding: 2px 3px; white-space: nowrap; cursor: pointer;',
       '}',
+      '.' + CONTROL_MENU_CLASS + '__threading-control { position: relative; display: flex; align-items: center; min-width: 0; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-control > .' + CONTROL_MENU_CLASS + '__item { flex: 1 1 auto; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings-button {',
+      '  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 26px; width: 26px; height: 26px;',
+      '  border: 0; border-radius: 4px; padding: 0; background: transparent; color: inherit; cursor: pointer;',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings-button:hover,',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings-button:focus-visible,',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings-button[aria-expanded="true"] {',
+      '  background: rgba(17,126,150,.12); color: #117e96; outline: none;',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings-button > .material-icons { font-size: 18px; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings {',
+      '  position: absolute; z-index: 2; top: calc(100% + 5px); left: 0; min-width: 218px;',
+      '  padding: 6px; border: 1px solid rgba(127,127,127,.45); border-radius: 4px;',
+      '  background: Canvas; color: CanvasText; box-shadow: 0 2px 8px rgba(0,0,0,.18);',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings > .' + CONTROL_MENU_CLASS + '__item { font-size: .92em; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-control { position: relative; display: flex; align-items: center; min-width: 0; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-control-title { flex: 1 1 auto; cursor: default; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings-button {',
+      '  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 26px; width: 26px; height: 26px;',
+      '  border: 0; border-radius: 4px; padding: 0; background: transparent; color: inherit; cursor: pointer;',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings-button:hover,',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings-button:focus-visible,',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings-button[aria-expanded="true"] {',
+      '  background: rgba(17,126,150,.12); color: #117e96; outline: none;',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings-button > .material-icons { font-size: 18px; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings {',
+      '  position: absolute; z-index: 2; top: calc(100% + 5px); left: 0; min-width: 218px;',
+      '  padding: 6px; border: 1px solid rgba(127,127,127,.45); border-radius: 4px;',
+      '  background: Canvas; color: CanvasText; box-shadow: 0 2px 8px rgba(0,0,0,.18);',
+      '}',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings > .' + CONTROL_MENU_CLASS + '__item { font-size: .92em; }',
       '@media (max-width: 480px) {',
       '  .' + CONTROL_MENU_CLASS + '__layout { grid-template-columns: minmax(0, 1fr); }',
       '  .' + CONTROL_MENU_CLASS + '__group { grid-template-columns: minmax(0, 1fr); }',
@@ -89,7 +130,7 @@
       '  margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(127,127,127,.25);',
       '}',
       '.' + CONTROL_MENU_CLASS + '__actions-row { display: flex; gap: 6px; }',
-      '.' + CONTROL_MENU_CLASS + '__reset, .' + CONTROL_MENU_CLASS + '__recommend {',
+      '.' + CONTROL_MENU_CLASS + '__reset {',
       '  display: inline-flex; align-items: center; justify-content: center; gap: 5px;',
       '  flex: 1 1 auto; min-height: 30px; border: 1px solid rgba(127,127,127,.55);',
       '  border-radius: 4px; background: transparent; color: inherit; cursor: pointer;',
@@ -100,8 +141,8 @@
       '  border-radius: 4px; background: transparent; color: inherit; cursor: pointer;',
       '}',
       '.' + CONTROL_MENU_CLASS + '__info > .material-icons { font-size: 18px; }',
-      '.' + CONTROL_MENU_CLASS + '__reset:hover, .' + CONTROL_MENU_CLASS + '__recommend:hover,',
-      '.' + CONTROL_MENU_CLASS + '__reset:focus-visible, .' + CONTROL_MENU_CLASS + '__recommend:focus-visible {',
+      '.' + CONTROL_MENU_CLASS + '__reset:hover,',
+      '.' + CONTROL_MENU_CLASS + '__reset:focus-visible {',
       '  border-color: #117e96; background: rgba(17,126,150,.1); color: #117e96;',
       '  outline: none;',
       '}',
@@ -140,6 +181,89 @@
     track.setAttribute('aria-hidden', 'true');
     label.appendChild(track);
     return label;
+  }
+
+  function createThreadingControl(state, onSettingChange) {
+    var control = document.createElement('div');
+    control.className = CONTROL_MENU_CLASS + '__threading-control';
+    control.appendChild(createMenuToggle('階層留言', 'threadingEnabled', state, onSettingChange));
+
+    var settingsButton = document.createElement('button');
+    settingsButton.type = 'button';
+    settingsButton.className = CONTROL_MENU_CLASS + '__threading-settings-button';
+    settingsButton.setAttribute('aria-label', '展開階層留言設定');
+    settingsButton.setAttribute('aria-expanded', 'false');
+    settingsButton.title = '階層留言設定';
+    settingsButton.appendChild(createMaterialIcon('tune'));
+
+    var settings = document.createElement('div');
+    settings.className = CONTROL_MENU_CLASS + '__threading-settings';
+    settings.hidden = true;
+    settings.appendChild(createMenuToggle('階層時遮蔽樓層', 'hideReplyAnnotation', state, onSettingChange, {
+      disabled: !state.threadingEnabled
+    }));
+    settings.appendChild(createMenuToggle('顯示階層分隔線', 'showThreadSeparators', state, onSettingChange, {
+      disabled: !state.threadingEnabled
+    }));
+    settings.appendChild(createMenuToggle('收合階層', 'collapseThreadingEnabled', state, onSettingChange, {
+      disabled: !state.threadingEnabled
+    }));
+
+    settingsButton.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var shouldOpen = settings.hidden;
+      closeSettingsPanels(control.closest('.' + CONTROL_MENU_CLASS), shouldOpen ? settings : null);
+      settings.hidden = !shouldOpen;
+      settingsButton.setAttribute('aria-expanded', String(shouldOpen));
+    });
+    control.appendChild(settingsButton);
+    control.appendChild(settings);
+    return control;
+  }
+
+  function createAvatarControl(state, onSettingChange) {
+    var control = document.createElement('div');
+    control.className = CONTROL_MENU_CLASS + '__avatar-control';
+
+    var title = document.createElement('div');
+    title.className = CONTROL_MENU_CLASS + '__item ' + CONTROL_MENU_CLASS + '__avatar-control-title';
+    title.textContent = '頭像樣式';
+    control.appendChild(title);
+
+    var settingsButton = document.createElement('button');
+    settingsButton.type = 'button';
+    settingsButton.className = CONTROL_MENU_CLASS + '__avatar-settings-button';
+    settingsButton.setAttribute('aria-label', '展開頭像樣式設定');
+    settingsButton.setAttribute('aria-expanded', 'false');
+    settingsButton.title = '頭像樣式設定';
+    settingsButton.appendChild(createMaterialIcon('tune'));
+
+    var settings = document.createElement('div');
+    settings.className = CONTROL_MENU_CLASS + '__avatar-settings';
+    settings.hidden = true;
+    settings.appendChild(createMenuSelect('頭像大小', 'avatarDisplay', [
+      { value: 'default', label: '預設' },
+      { value: 'small', label: '縮小' },
+      { value: 'none', label: '隱藏' }
+    ], state, onSettingChange));
+    settings.appendChild(createMenuSelect('頭像形狀', 'avatarShape', [
+      { value: 'round', label: '圓形' },
+      { value: 'square', label: '方形' }
+    ], state, onSettingChange));
+    settings.appendChild(createMenuToggle('停懸顯示樓層', 'floorAtAvatarEnabled', state, onSettingChange));
+
+    settingsButton.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var shouldOpen = settings.hidden;
+      closeSettingsPanels(control.closest('.' + CONTROL_MENU_CLASS), shouldOpen ? settings : null);
+      settings.hidden = !shouldOpen;
+      settingsButton.setAttribute('aria-expanded', String(shouldOpen));
+    });
+    control.appendChild(settingsButton);
+    control.appendChild(settings);
+    return control;
   }
 
   function createMenuSelect(labelText, settingName, options, state, onSettingChange, config) {
@@ -182,20 +306,11 @@
     return icon;
   }
 
-  function createActions(onReset, onRecommend) {
+  function createActions(onReset) {
     var actions = document.createElement('div');
     actions.className = CONTROL_MENU_CLASS + '__actions';
     var row = document.createElement('div');
     row.className = CONTROL_MENU_CLASS + '__actions-row';
-
-    var recommendButton = document.createElement('button');
-    recommendButton.type = 'button';
-    recommendButton.className = CONTROL_MENU_CLASS + '__recommend';
-    recommendButton.title = '套用推薦設定';
-    recommendButton.appendChild(createMaterialIcon('recommend'));
-    recommendButton.appendChild(document.createTextNode('推薦設定'));
-    recommendButton.addEventListener('click', onRecommend);
-    row.appendChild(recommendButton);
 
     var resetButton = document.createElement('button');
     resetButton.type = 'button';
@@ -228,12 +343,26 @@
     return actions;
   }
 
+  function closeSettingsPanels(container, exceptSettings) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll(
+        '.' + CONTROL_MENU_CLASS + '__threading-settings, .' + CONTROL_MENU_CLASS + '__avatar-settings'
+      ), function (settings) {
+      if (settings === exceptSettings) return;
+      settings.hidden = true;
+      var settingsButton = settings.previousElementSibling;
+      if (settingsButton) settingsButton.setAttribute('aria-expanded', 'false');
+    });
+  }
+
   function closeMenus(exceptMenu) {
     Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS), function (menu) {
-      if (menu === exceptMenu) return;
-      menu.hidden = true;
-      var gear = menu.parentElement.querySelector('button.' + CONTROL_CLASS);
-      if (gear) gear.setAttribute('aria-expanded', 'false');
+      if (menu !== exceptMenu) {
+        menu.hidden = true;
+        var gear = menu.parentElement.querySelector('button.' + CONTROL_CLASS);
+        if (gear) gear.setAttribute('aria-expanded', 'false');
+      }
+      closeSettingsPanels(menu);
     });
   }
 
@@ -242,8 +371,14 @@
     document._commentThreadOutsideMenuCloseInstalled = true;
     document.addEventListener('click', function (event) {
       var target = event.target;
-      if (target && target.closest && target.closest('.' + CONTROL_BAR_CLASS)) return;
-      closeMenus();
+      var controls = target && target.closest && target.closest('.' + CONTROL_BAR_CLASS);
+      if (!controls) {
+        closeMenus();
+        return;
+      }
+      if (!target.closest('.' + CONTROL_MENU_CLASS + '__threading-control, .' + CONTROL_MENU_CLASS + '__avatar-control')) {
+        closeSettingsPanels(controls);
+      }
     });
   }
 
@@ -310,45 +445,28 @@
     var commentGroup = document.createElement('div');
     commentGroup.className = CONTROL_MENU_CLASS + '__group';
     commentGroup.appendChild(createGroupTitle('留言與排序'));
-    commentGroup.appendChild(createMenuToggle('階層留言', 'threadingEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createThreadingControl(state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('自動展開所有留言', 'autoExpandCommentsEnabled', state, options.onSettingChange));
-    commentGroup.appendChild(createMenuToggle('階層時遮蔽樓層', 'hideReplyAnnotation', state, options.onSettingChange, {
-      secondary: true,
-      disabled: !state.threadingEnabled
-    }));
-    commentGroup.appendChild(createMenuToggle('顯示階層分隔線', 'showThreadSeparators', state, options.onSettingChange, {
-      secondary: true,
-      disabled: !state.threadingEnabled
-    }));
     commentGroup.appendChild(createMenuSelect('排序方式', 'commentSortMode', [
       { value: 'default', label: '原始' },
       { value: 'hot', label: '熱門排序' }
     ], state, options.onSettingChange));
-    commentGroup.appendChild(createMenuToggle('摺疊留言底欄', 'footerInteractionCollapseEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createMenuToggle('收合底欄', 'footerInteractionCollapseEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('回覆框跟隨留言', 'replyEditorFollowEnabled', state, options.onSettingChange));
-    commentGroup.appendChild(createMenuToggle('標記強化', 'replyAnnotationPreviewEnabled', state, options.onSettingChange));
-    commentGroup.appendChild(createMenuToggle('顯示標記', 'quickMarkerButtonsEnabled', state, options.onSettingChange));
-    commentGroup.appendChild(createMenuToggle('推噓移至右側', 'reactionInlineEnabled', state, options.onSettingChange));
+    commentGroup.appendChild(createMenuToggle('標記優化', 'markerEnhancementEnabled', state, options.onSettingChange));
 
     var displayGroup = document.createElement('div');
     displayGroup.className = CONTROL_MENU_CLASS + '__group';
     displayGroup.appendChild(createGroupTitle('顯示'));
     displayGroup.appendChild(createMenuToggle('用戶名至底', 'userNameAtBottomEnabled', state, options.onSettingChange));
-    displayGroup.appendChild(createMenuSelect('頭像大小', 'avatarDisplay', [
-      { value: 'default', label: '預設' },
-      { value: 'small', label: '縮小' },
-      { value: 'none', label: '隱藏' }
-    ], state, options.onSettingChange));
-    displayGroup.appendChild(createMenuSelect('頭像樣式', 'avatarShape', [
-      { value: 'round', label: '圓形' },
-      { value: 'square', label: '方形' }
-    ], state, options.onSettingChange));
-    displayGroup.appendChild(createMenuToggle('停懸顯示樓層', 'floorAtAvatarEnabled', state, options.onSettingChange));
+    displayGroup.appendChild(createAvatarControl(state, options.onSettingChange));
     displayGroup.appendChild(createMenuSelect('時間顯示', 'timeDisplay', [
       { value: 'default', label: '預設時間' },
+      { value: 'full', label: '完整時間' },
       { value: 'relative', label: '相對時間' }
     ], state, options.onSettingChange));
     displayGroup.appendChild(createMenuToggle('隱藏 HOT 標籤', 'hideHotTagEnabled', state, options.onSettingChange));
+    displayGroup.appendChild(createMenuToggle('推噓移至右側', 'reactionInlineEnabled', state, options.onSettingChange));
 
     var imageGroup = document.createElement('div');
     imageGroup.className = CONTROL_MENU_CLASS + '__group';
@@ -361,8 +479,17 @@
     layout.appendChild(commentGroup);
     layout.appendChild(displayGroup);
     layout.appendChild(imageGroup);
+    var themeControl = createMenuSelect(
+      '主題',
+      'commentStyle',
+      tools.features.commentStyles.getOptions(),
+      state,
+      options.onSettingChange
+    );
+    themeControl.classList.add(CONTROL_MENU_CLASS + '__theme');
+    menu.appendChild(themeControl);
     menu.appendChild(layout);
-    menu.appendChild(createActions(options.onReset, options.onRecommend));
+    menu.appendChild(createActions(options.onReset));
 
     controls.appendChild(gear);
     controls.appendChild(menu);
@@ -374,22 +501,30 @@
       menu.hidden = !shouldOpen;
       gear.setAttribute('aria-expanded', String(shouldOpen));
     });
+    sync(state, options.getDisabledSettings ? options.getDisabledSettings() : []);
   }
 
-  function sync(state) {
+  function sync(state, disabledSettings) {
+    disabledSettings = disabledSettings || [];
     Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__switch'), function (toggle) {
       var enabled = Boolean(state[toggle.dataset.commentThreadSetting]);
       toggle.checked = enabled;
       toggle.setAttribute('aria-checked', String(enabled));
-      var isThreadingChild = ['hideReplyAnnotation', 'showThreadSeparators']
+      var isThreadingChild = ['hideReplyAnnotation', 'showThreadSeparators', 'collapseThreadingEnabled']
         .indexOf(toggle.dataset.commentThreadSetting) !== -1;
-      toggle.disabled = isThreadingChild && !state.threadingEnabled;
-      toggle.closest('label').classList.toggle('is-disabled', toggle.disabled);
+      var disabledByStyle = disabledSettings.indexOf(toggle.dataset.commentThreadSetting) !== -1;
+      toggle.disabled = (isThreadingChild && !state.threadingEnabled) || disabledByStyle;
+      var toggleLabel = toggle.closest('label');
+      toggleLabel.classList.toggle('is-disabled', toggle.disabled);
+      toggleLabel.title = disabledByStyle ? '目前樣式不支援此功能' : '';
     });
     Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__select'), function (select) {
       select.value = state[select.dataset.commentThreadSetting];
-      select.disabled = false;
-      select.closest('label').classList.remove('is-disabled');
+      var disabledByStyle = disabledSettings.indexOf(select.dataset.commentThreadSetting) !== -1;
+      select.disabled = disabledByStyle;
+      var selectLabel = select.closest('label');
+      selectLabel.classList.toggle('is-disabled', disabledByStyle);
+      selectLabel.title = disabledByStyle ? '目前樣式不支援此功能' : '';
     });
   }
 

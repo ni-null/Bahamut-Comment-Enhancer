@@ -99,7 +99,7 @@ function getContentScriptPaths() {
   }, []);
 }
 
-function createUserscriptHeader(metadata, version, recommendedSettings) {
+function createUserscriptHeader(metadata, version) {
   var lines = [
     '// ==UserScript==',
     '// @name         ' + metadata.name,
@@ -122,7 +122,6 @@ function createUserscriptHeader(metadata, version, recommendedSettings) {
     '',
     'window.BahamutCommentTools = window.BahamutCommentTools || {};',
     'window.BahamutCommentTools.version = ' + JSON.stringify(version) + ';',
-    'window.BahamutCommentTools.recommendedSettingsDefinition = ' + JSON.stringify(recommendedSettings) + ';',
     ''
   );
   return lines.join('\n');
@@ -131,12 +130,9 @@ function createUserscriptHeader(metadata, version, recommendedSettings) {
 async function buildUserscript() {
   var metadata = JSON.parse(fs.readFileSync(path.join(BROWSER_DIRECTORY, 'tampermonkey', 'metadata.json'), 'utf8'));
   var manifest = getManifest('chrome');
-  var recommendedSettings = JSON.parse(fs.readFileSync(
-    path.join(PROJECT_ROOT, 'content', 'config', 'recommended-settings.json'), 'utf8'
-  ));
   var scriptPath = path.join(DIST_DIRECTORY, 'bahamut-comment-enhancer.user.js');
 
-  var source = [createUserscriptHeader(metadata, manifest.version, recommendedSettings)];
+  var source = [createUserscriptHeader(metadata, manifest.version)];
   for (var index = 0; index < getContentScriptPaths().length; index += 1) {
     var relativePath = getContentScriptPaths()[index];
     source.push(await minifyJavaScript(fs.readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8'), relativePath));

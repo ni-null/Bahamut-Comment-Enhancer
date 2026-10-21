@@ -15,16 +15,16 @@
   var relativeTime = tools.features.relativeTime;
   var footerCollapse = tools.features.footerCollapse;
   var replyEditorFollow = tools.features.replyEditorFollow;
-  var replyAnnotationPreview = tools.features.replyAnnotationPreview;
+  var markerEnhancement = tools.features.markerEnhancement;
   var reactionInline = tools.features.reactionInline;
   var replyAnnotation = tools.features.replyAnnotation;
   var autoExpand = tools.features.autoExpand;
   var hideHotTag = tools.features.hideHotTag;
+  var commentStyles = tools.features.commentStyles;
   var controlMenu = tools.ui.controlMenu;
   var structureValidator = tools.structureValidator;
   var storage = tools.settings;
   var state = storage.normalize();
-  var recommendedSettings = storage.normalize();
   var relativeTimeTimer = null;
 
   function reportError(context, error) {
@@ -34,23 +34,33 @@
   }
 
   function needsCommentObserver() {
-    return state.threadingEnabled || state.userNameAtBottomEnabled ||
-      state.avatarDisplay !== 'default' || state.imageSmallPreviewEnabled ||
-      state.imageHoverPreviewEnabled || state.timeDisplay !== 'default' ||
-      state.footerInteractionCollapseEnabled || state.floorAtAvatarEnabled ||
-      state.reactionInlineEnabled || state.replyAnnotationPreviewEnabled ||
-      state.quickMarkerButtonsEnabled ||
-      state.avatarShape !== 'round' || state.commentSortMode !== 'default' ||
-      state.autoExpandCommentsEnabled || state.hideHotTagEnabled;
+    var effectiveState = getEffectiveState();
+    return effectiveState.threadingEnabled || effectiveState.userNameAtBottomEnabled ||
+      effectiveState.avatarDisplay !== 'default' || effectiveState.imageSmallPreviewEnabled ||
+      effectiveState.imageHoverPreviewEnabled || effectiveState.timeDisplay !== 'default' ||
+      effectiveState.footerInteractionCollapseEnabled || effectiveState.floorAtAvatarEnabled ||
+      effectiveState.reactionInlineEnabled || effectiveState.markerEnhancementEnabled ||
+      effectiveState.avatarShape !== 'round' || effectiveState.commentSortMode !== 'default' ||
+      effectiveState.autoExpandCommentsEnabled || effectiveState.hideHotTagEnabled ||
+      effectiveState.commentStyle !== 'default';
+  }
+
+  function getEffectiveState() {
+    return commentStyles.resolveSettings(state, storage.defaults);
   }
 
   function syncControls() {
-    controlMenu.sync(state);
+    controlMenu.sync(state, commentStyles.getDisabledSettings(state.commentStyle));
   }
 
   function setSetting(name, value) {
     var nextState = Object.assign({}, state);
     nextState[name] = value;
+    if (name === 'commentStyle' && value !== state.commentStyle) {
+      // 主題第一次被選取時套用其預設值；之後使用者仍可自由微調。
+      nextState = Object.assign(nextState, commentStyles.getDefaultSettings(value));
+      nextState.commentStyle = value;
+    }
     state = storage.normalize(nextState);
     applySettingsToMountedLists();
     syncRelativeTimeTimer();
@@ -65,13 +75,14 @@
   }
 
   function refreshRelativeTimes() {
+    var effectiveState = getEffectiveState();
     Array.prototype.forEach.call(document.querySelectorAll(tools.selectors.list), function (list) {
-      if (list.dataset.commentThreadMounted === 'true') relativeTime.apply(list, state.timeDisplay);
+      if (list.dataset.commentThreadMounted === 'true') relativeTime.apply(list, effectiveState.timeDisplay);
     });
   }
 
   function syncRelativeTimeTimer() {
-    if (state.timeDisplay !== 'relative') {
+    if (getEffectiveState().timeDisplay !== 'relative') {
       if (relativeTimeTimer) window.clearInterval(relativeTimeTimer);
       relativeTimeTimer = null;
       return;
@@ -80,15 +91,7 @@
   }
 
   function resetSettings() {
-    state = storage.normalize(storage.defaults);
-    applySettingsToMountedLists();
-    syncRelativeTimeTimer();
-    syncControls();
-    storage.save(state);
-  }
-
-  function applyRecommendedSettings() {
-    state = storage.normalize(recommendedSettings);
+    state = storage.normalize(Object.assign({}, storage.defaults, commentStyles.getDefaultSettings('default')));
     applySettingsToMountedLists();
     syncRelativeTimeTimer();
     syncControls();
@@ -123,35 +126,40 @@
     if (!list || list.dataset.commentThreadRefreshing === 'true') return;
 
     var observer = list._commentThreadObserver;
+    var effectiveState = getEffectiveState();
     if (observer) observer.disconnect();
     list.dataset.commentThreadRefreshing = 'true';
     try {
       if (autoExpand && typeof autoExpand.apply === 'function') {
-        autoExpand.apply(list, state.autoExpandCommentsEnabled);
+        autoExpand.apply(list, effectiveState.autoExpandCommentsEnabled);
       }
-      if (state.threadingEnabled) threading.apply(list, state.commentSortMode, state.showThreadSeparators);
+      if (effectiveState.threadingEnabled) {
+        threading.apply(
+          list,
+          effectiveState.commentSortMode,
+          effectiveState.showThreadSeparators,
+          effectiveState.collapseThreadingEnabled
+        );
+      }
       else {
         threading.flatten(list);
-        sorting.sortFlat(list, state.commentSortMode);
+        sorting.sortFlat(list, effectiveState.commentSortMode);
       }
 
-      if (state.userNameAtBottomEnabled) userNameFooter.apply(list);
+      if (effectiveState.userNameAtBottomEnabled) userNameFooter.apply(list);
       else userNameFooter.restore(list);
 
-      avatar.apply(list, state.avatarDisplay, state.avatarShape);
-      floorAvatar.apply(list, state.floorAtAvatarEnabled);
-      imagePreview.apply(list, state.imageSmallPreviewEnabled, state.imageHoverPreviewEnabled);
-      relativeTime.apply(list, state.timeDisplay);
-      footerCollapse.apply(list, state.footerInteractionCollapseEnabled);
-      replyEditorFollow.apply(list, state.replyEditorFollowEnabled);
-      replyAnnotationPreview.apply(
-        list,
-        state.replyAnnotationPreviewEnabled,
-        state.quickMarkerButtonsEnabled
-      );
-      reactionInline.apply(list, state.reactionInlineEnabled);
-      replyAnnotation.apply(list, state.threadingEnabled && state.hideReplyAnnotation);
-      hideHotTag.apply(list, state.hideHotTagEnabled);
+      avatar.apply(list, effectiveState.avatarDisplay, effectiveState.avatarShape);
+      floorAvatar.apply(list, effectiveState.floorAtAvatarEnabled);
+      imagePreview.apply(list, effectiveState.imageSmallPreviewEnabled, effectiveState.imageHoverPreviewEnabled);
+      relativeTime.apply(list, effectiveState.timeDisplay);
+      footerCollapse.apply(list, effectiveState.footerInteractionCollapseEnabled);
+      replyEditorFollow.apply(list, effectiveState.replyEditorFollowEnabled);
+      markerEnhancement.apply(list, effectiveState.markerEnhancementEnabled);
+      reactionInline.apply(list, effectiveState.reactionInlineEnabled);
+      replyAnnotation.apply(list, effectiveState.threadingEnabled && effectiveState.hideReplyAnnotation);
+      hideHotTag.apply(list, effectiveState.hideHotTagEnabled);
+      commentStyles.apply(list, effectiveState.commentStyle);
     } catch (error) {
       reportError('套用留言功能時發生錯誤，已停止本次更新。', error);
     } finally {
@@ -205,9 +213,9 @@
     try {
       controlMenu.mount(validation.host, {
         getState: function () { return state; },
+        getDisabledSettings: function () { return commentStyles.getDisabledSettings(state.commentStyle); },
         onSettingChange: setSetting,
         onReset: resetSettings,
-        onRecommend: applyRecommendedSettings,
         validation: validation
       });
     } catch (error) {
@@ -233,10 +241,11 @@
     relativeTime.apply(list, 'default');
     footerCollapse.apply(list, false);
     replyEditorFollow.apply(list, false);
-    replyAnnotationPreview.apply(list, false);
+    markerEnhancement.apply(list, false);
     reactionInline.apply(list, false);
     replyAnnotation.apply(list, false);
     hideHotTag.apply(list, false);
+    commentStyles.apply(list, 'default');
     delete list.dataset.commentThreadMounted;
   }
 
@@ -274,13 +283,12 @@
 
   function start() {
     storage.load(function (savedState, hasSavedSettings) {
-      storage.loadRecommended(function (definition) {
-        recommendedSettings = definition.settings;
-        state = hasSavedSettings ? storage.normalize(savedState) : storage.normalize(recommendedSettings);
-        if (!hasSavedSettings) storage.save(state);
-        init();
-        syncRelativeTimeTimer();
-      });
+      state = hasSavedSettings
+        ? storage.normalize(savedState)
+        : storage.normalize(Object.assign({}, storage.defaults, commentStyles.getDefaultSettings('default')));
+      if (!hasSavedSettings) storage.save(state);
+      init();
+      syncRelativeTimeTimer();
     });
   }
 

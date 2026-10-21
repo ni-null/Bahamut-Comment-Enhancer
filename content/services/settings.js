@@ -7,10 +7,11 @@
 
   var tools = window.BahamutCommentTools = window.BahamutCommentTools || {};
   var STORAGE_KEY = 'commentThreadSettings';
-  var RECOMMENDED_SETTINGS_PATH = 'content/config/recommended-settings.json';
+  var LEGACY_COMMENT_STYLE_NAMES = Object.freeze({ modern: 'block' });
   var DEFAULTS = Object.freeze({
     threadingEnabled: false,
     showThreadSeparators: true,
+    collapseThreadingEnabled: false,
     userNameAtBottomEnabled: false,
     avatarDisplay: 'default',
     avatarShape: 'round',
@@ -19,13 +20,13 @@
     timeDisplay: 'default',
     footerInteractionCollapseEnabled: false,
     replyEditorFollowEnabled: false,
-    replyAnnotationPreviewEnabled: false,
-    quickMarkerButtonsEnabled: false,
+    markerEnhancementEnabled: false,
     reactionInlineEnabled: false,
     floorAtAvatarEnabled: false,
     hideReplyAnnotation: false,
     autoExpandCommentsEnabled: false,
     hideHotTagEnabled: false,
+    commentStyle: 'default',
     commentSortMode: 'default'
   });
 
@@ -37,6 +38,9 @@
       showThreadSeparators: value && typeof value.showThreadSeparators === 'boolean'
         ? value.showThreadSeparators
         : DEFAULTS.showThreadSeparators,
+      collapseThreadingEnabled: value && typeof value.collapseThreadingEnabled === 'boolean'
+        ? value.collapseThreadingEnabled
+        : DEFAULTS.collapseThreadingEnabled,
       userNameAtBottomEnabled: value && typeof value.userNameAtBottomEnabled === 'boolean'
         ? value.userNameAtBottomEnabled
         : DEFAULTS.userNameAtBottomEnabled,
@@ -52,7 +56,7 @@
       imageHoverPreviewEnabled: value && typeof value.imageHoverPreviewEnabled === 'boolean'
         ? value.imageHoverPreviewEnabled
         : DEFAULTS.imageHoverPreviewEnabled,
-      timeDisplay: value && ['default', 'relative'].indexOf(value.timeDisplay) !== -1
+      timeDisplay: value && ['default', 'full', 'relative'].indexOf(value.timeDisplay) !== -1
         ? value.timeDisplay
         : DEFAULTS.timeDisplay,
       footerInteractionCollapseEnabled: value && typeof value.footerInteractionCollapseEnabled === 'boolean'
@@ -61,12 +65,9 @@
       replyEditorFollowEnabled: value && typeof value.replyEditorFollowEnabled === 'boolean'
         ? value.replyEditorFollowEnabled
         : DEFAULTS.replyEditorFollowEnabled,
-      replyAnnotationPreviewEnabled: value && typeof value.replyAnnotationPreviewEnabled === 'boolean'
-        ? value.replyAnnotationPreviewEnabled
-        : DEFAULTS.replyAnnotationPreviewEnabled,
-      quickMarkerButtonsEnabled: value && typeof value.quickMarkerButtonsEnabled === 'boolean'
-        ? value.quickMarkerButtonsEnabled
-        : DEFAULTS.quickMarkerButtonsEnabled,
+      markerEnhancementEnabled: value && typeof value.markerEnhancementEnabled === 'boolean'
+        ? value.markerEnhancementEnabled
+        : Boolean(value && (value.replyAnnotationPreviewEnabled || value.quickMarkerButtonsEnabled)),
       reactionInlineEnabled: value && typeof value.reactionInlineEnabled === 'boolean'
         ? value.reactionInlineEnabled
         : DEFAULTS.reactionInlineEnabled,
@@ -82,6 +83,11 @@
       hideHotTagEnabled: value && typeof value.hideHotTagEnabled === 'boolean'
         ? value.hideHotTagEnabled
         : DEFAULTS.hideHotTagEnabled,
+      commentStyle: value && tools.features.commentStyles && tools.features.commentStyles.has(
+        LEGACY_COMMENT_STYLE_NAMES[value.commentStyle] || value.commentStyle
+      )
+        ? (LEGACY_COMMENT_STYLE_NAMES[value.commentStyle] || value.commentStyle)
+        : DEFAULTS.commentStyle,
       commentSortMode: value && ['default', 'hot'].indexOf(value.commentSortMode) !== -1
         ? value.commentSortMode
         : DEFAULTS.commentSortMode
@@ -144,41 +150,10 @@
     }
   }
 
-  function normalizeRecommended(value) {
-    return {
-      title: value && typeof value.title === 'string' ? value.title : '推薦設定',
-      description: value && typeof value.description === 'string' ? value.description : '',
-      settings: normalize(value && value.settings)
-    };
-  }
-
-  function loadRecommended(callback) {
-    if (tools.recommendedSettingsDefinition) {
-      callback(normalizeRecommended(tools.recommendedSettingsDefinition));
-      return;
-    }
-    if (window.chrome && window.chrome.runtime && typeof window.chrome.runtime.getURL === 'function') {
-      try {
-        window.fetch(window.chrome.runtime.getURL(RECOMMENDED_SETTINGS_PATH))
-          .then(function (response) {
-            if (!response.ok) throw new Error('無法讀取推薦設定檔。');
-            return response.json();
-          })
-          .then(function (definition) { callback(normalizeRecommended(definition)); })
-          .catch(function () { callback(normalizeRecommended()); });
-        return;
-      } catch (error) {
-        // 無法讀取設定檔時，使用 schema 預設值，避免阻礙主功能載入。
-      }
-    }
-    callback(normalizeRecommended());
-  }
-
   tools.settings = {
     defaults: DEFAULTS,
     normalize: normalize,
     load: load,
-    loadRecommended: loadRecommended,
     save: save
   };
 })(window);

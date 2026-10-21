@@ -1,5 +1,5 @@
 /**
- * 功能簡介：強化官方編輯器的 #B樓層:留言ID# 標記，提供預覽、逐一刪除與清除全部標記。
+ * 功能簡介：強化官方編輯器的 #B樓層:留言ID# 標記，提供預覽、逐一刪除、清除與樓層快速標記。
  * 不修改官方輸入框結構或回覆流程；只以 input 事件同步 textarea 內容。
  */
 (function (window, document) {
@@ -302,17 +302,14 @@
   }
 
   function refreshHost(host) {
-    var state = states.get(host);
-    if (!state) return;
-    if (state.previewEnabled) {
-      Array.prototype.forEach.call(host.querySelectorAll('.c-reply__editor'), function (editor) {
-        // 鏡像回覆框只負責輸入與送出；標記管理固定留在官方底部 editor。
-        if (isOfficialEditor(host, editor)) prepareEditor(host, editor);
-        else removePreview(editor);
-      });
-    } else removePreviews(host);
-    if (state.quickMarkerButtonsEnabled) renderFloorMarkers(host);
-    else removeFloorMarkers(host);
+    if (!states.has(host)) return;
+    // 標記預覽功能：鏡像回覆框只負責輸入與送出；標記管理固定留在官方底部 editor。
+    Array.prototype.forEach.call(host.querySelectorAll('.c-reply__editor'), function (editor) {
+      if (isOfficialEditor(host, editor)) prepareEditor(host, editor);
+      else removePreview(editor);
+    });
+    // 樓層標記功能：將每個樓層號轉成可追加標記的控制項。
+    renderFloorMarkers(host);
   }
 
   function installReplyClickListener() {
@@ -333,29 +330,27 @@
     editorRestoreListenerInstalled = true;
     document.addEventListener('bahamut-comment-reply-editor-restored', function (event) {
       var host = event.detail && event.detail.host;
-      // editor 回到底部後，由標記強化本身依當前 DOM 結構重新建立預覽。
+      // editor 回到底部後，由標記優化依當前 DOM 結構重新建立預覽。
       if (host && states.has(host)) refreshHost(host);
     });
   }
 
-  function apply(list, previewEnabled, quickMarkerButtonsEnabled) {
+  function apply(list, enabled) {
     var host = list && list.parentElement;
     if (!host) return;
-    if (!previewEnabled && !quickMarkerButtonsEnabled) {
+    if (!enabled) {
       removePreviews(host);
       removeFloorMarkers(host);
       states.delete(host);
       return;
     }
     addStyles();
-    states.set(host, { previewEnabled: Boolean(previewEnabled), quickMarkerButtonsEnabled: Boolean(quickMarkerButtonsEnabled) });
-    if (previewEnabled) {
-      installReplyClickListener();
-      installEditorRestoreListener();
-    }
+    states.set(host, true);
+    installReplyClickListener();
+    installEditorRestoreListener();
     refreshHost(host);
   }
 
   tools.features = tools.features || {};
-  tools.features.replyAnnotationPreview = { apply: apply };
+  tools.features.markerEnhancement = { apply: apply };
 })(window, document);

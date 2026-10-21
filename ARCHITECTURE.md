@@ -9,7 +9,7 @@ service worker。
 腳本依 manifest 的陣列順序執行；不要任意調換順序。
 
 ```text
-auto-expand-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reply-editor-follow / reply-annotation-preview / reaction-inline / reply-annotation / auto-expand → info-modal / control-menu → settings → main
+auto-expand-page（MAIN world）→ comment-parser → structure-validator → sorting → threading / username-footer / avatar / floor-avatar / image-preview / relative-time / footer-collapse / reply-editor-follow / marker-enhancement / reaction-inline / reply-annotation / auto-expand / comment-styles → info-modal / control-menu → settings → main
 ```
 
 所有模組共用 `window.BahamutCommentTools` 命名空間，但不會污染論壇頁面的其他名稱。
@@ -46,19 +46,21 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/avatar.js` | 控制留言頭像顯示方式與圓形／方形樣式 | 選單、設定讀寫、AJAX observer |
 | `content/features/floor-avatar.js` | 懸停頭像時以樓層數字覆蓋圖片，並相容還原舊版樓層徽章 | 選單、設定讀寫、頭像顯示模式 |
 | `content/features/image-preview.js` | 控制留言內文圖片縮小預覽與 Hover 時模擬原圖點擊 | 選單、設定讀寫、圖片放大器實作 |
-| `content/features/relative-time.js` | 在預設日期與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
+| `content/features/relative-time.js` | 在預設、完整與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
 | `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將同一個官方 editor 節點搬到該留言 footer 下方；原位置保留可點擊的回復列，點擊即可搬回底部，因此完全沿用官方 Enter、按鈕與事件 | 回覆內容、官方回覆函式、其他留言功能 |
-| `content/features/reply-annotation-preview.js` | 僅在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部；「顯示標記」可獨立控制各樓層號的追加標記互動 | 官方輸入框內容、回覆送出流程 |
+| `content/features/marker-enhancement.js` | 在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部，並讓各樓層號可追加標記 | 官方輸入框內容、回覆送出流程 |
 | `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
 | `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
 | `content/features/auto-expand-page.js` | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果 | 外掛 UI、留言 DOM 處理 |
 | `content/features/auto-expand.js` | 以 `IntersectionObserver` 等待留言區接近可視範圍後，解析官方展開連結的參數並透過 MAIN-world 橋接請求 `extendComment()`；處理回應、逾時與錯誤，不呼叫 `foldedComment()` | 官方留言載入流程 |
 | `content/features/hide-hot-tag.js` | 以擴充功能屬性隱藏或還原官方 `.comment_hot-tag`，不修改原始留言內容 | 選單、設定讀寫 |
+| `content/features/comment-styles.js` | 註冊、切換、還原留言樣式，並依各樣式的 `disabledSettings` 產生有效設定與 `defaultSettings` 套用主題預設；樣式實作位於 `content/features/comment-styles/` | 個別樣式的 CSS、論壇留言內容 |
+| `content/features/comment-styles/default.js` | 預設主題及預設功能組合；首次使用與還原預設時套用 | 設定讀寫、其他樣式 |
+| `content/features/comment-styles/block.js` | 區塊化留言卡片樣式：第一列作者、樓層與時間，第二列標記與內容，第三列互動；以 `disabledSettings` 停用與版面衝突的功能，並以 `defaultSettings` 預設開啟回覆框跟隨留言 | 設定讀寫、其他樣式 |
 | `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
 | `content/ui/control-menu.js` | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作 | 設定儲存、留言功能套用 |
 | `content/services/settings.js` | `chrome.storage.local` 的 schema、預設值、讀寫與容錯 | 頁面 DOM |
-| `content/config/recommended-settings.json` | 可調整「推薦設定」按鈕套用內容的宣告式設定檔 | 頁面 DOM、功能實作 |
 | `content/main.js` | 設定狀態協調、功能組合、低成本 AJAX observer 與 UI 回呼 | 選單、Modal、留言關聯解析細節 |
 
 ## 設定 schema
@@ -70,6 +72,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 {
   "threadingEnabled": false,
   "showThreadSeparators": true,
+  "collapseThreadingEnabled": false,
   "userNameAtBottomEnabled": false,
   "avatarDisplay": "default",
   "avatarShape": "round",
@@ -78,23 +81,23 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
   "timeDisplay": "default",
   "footerInteractionCollapseEnabled": false,
   "replyEditorFollowEnabled": false,
-  "replyAnnotationPreviewEnabled": false,
+  "markerEnhancementEnabled": false,
   "reactionInlineEnabled": false,
   "floorAtAvatarEnabled": false,
   "hideReplyAnnotation": false,
   "autoExpandCommentsEnabled": false,
+  "hideHotTagEnabled": false,
+  "commentStyle": "default",
   "commentSortMode": "default"
 }
 ```
 
 新增選項時，先修改 `content/services/settings.js` 的 `DEFAULTS` 與 `normalize()`；
 再於 `content/ui/control-menu.js` 增加選單控制，並於 `content/main.js` 增加功能套用。不要直接讀寫 `chrome.storage`。
-選單的「還原預設」會透過同一 service 套用並儲存 `DEFAULTS`。
-「推薦設定」則讀取 `content/config/recommended-settings.json` 的 `settings` 後套用並儲存；可直接修改該 JSON
-調整推薦按鈕的行為。擴充功能版本於執行時讀取此檔，Tampermonkey 建置時會內嵌同一份內容。
+選單的「還原預設」會套用並儲存 `comment-styles/default.js` 的 `defaultSettings`。
 
 頁面啟動時必須先完成 `settings.load()`，再掛載齒輪與套用功能；首次沒有儲存設定時會
-套用並儲存「推薦設定」，既有使用者的已儲存偏好則會直接生效，不需要再次切換開關。
+套用並儲存預設主題的 `defaultSettings`，既有使用者的已儲存偏好則會直接生效，不需要再次切換開關。
 
 ## 選單與功能行為
 
@@ -113,24 +116,20 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | --- | --- | --- |
 | 階層留言 | `階層留言` | 最多三層；關閉時會攤平回原本 DOM 順序。 |
 | 留言與排序 | `自動展開所有留言` | 留言區進入視窗上下 600px 的預載範圍時，才解析官方「顯示較早留言」控制項的 `bsn`、`snB` 並直接呼叫網站的 `extendComment()`；具錯誤與逾時保護，且不呼叫 `foldedComment()`，不會干預使用者手動收合。 |
-| 階層留言 | `遮蔽樓層標注` | 次級選項，僅階層留言開啟時可操作；隱藏內文第一個 `Forum.C.openCommentDialog` 連結（例如 `B12(william)`）。關閉階層時不刪除其偏好值。 |
-| 階層留言 | `顯示階層分隔線` | 次級選項，預設顯示子留言左側的階層分隔線；取消勾選即可隱藏。 |
+| 階層留言 | 右側設定按鈕 | 展開專用設定後，可切換「遮蔽樓層標注」、「顯示階層分隔線」與「收合階層」；收合階層只在第一層留言的卡片底部顯示收合列，以回覆者頭像堆疊、回覆數與最新時間提示討論串，展開後會顯示整個回覆分支。所有次選項僅階層留言開啟時可操作，關閉階層時不刪除其偏好值。 |
 | 排序 | `原始`、`熱門排序` | 獨立於階層功能；原始排序還原初見的留言順序。 |
 | 顯示 | `用戶名至底` | 將 `.reply-content__user` 放在 `name="comment_floor"` 的樓層號後方，套用 `float: left`、右側 `5px` 間距、12px 與灰色文字。 |
-| 顯示 | `頭像顯示` | `預設`、`縮小`（20×20 px）、`none`（隱藏）。 |
-| 顯示 | `頭像樣式` | 預設為`圓形`，可切換為`方形`。 |
-| 顯示 | `Hover 顯示樓層` | 滑鼠懸停頭像時，以 `name="comment_floor"` 的樓層數字覆蓋頭像；footer 的原始樓層仍維持顯示。 |
-| 顯示 | `時間顯示` | `預設時間`或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。 |
+| 顯示 | `頭像樣式`右側設定按鈕 | 展開專用設定後，可調整頭像大小、圓形／方形與停懸顯示樓層；停懸時以 `name="comment_floor"` 的樓層數字覆蓋頭像，footer 的原始樓層仍維持顯示。 |
+| 顯示 | `時間顯示` | `預設時間`、`完整時間`（由 `data-tippy-content` 取出秒級時間）或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。 |
 | 顯示 | `隱藏 HOT 標籤` | 隱藏官方留言上的 `HOT` 標籤；關閉後立即還原。 |
-| 顯示 | `摺疊留言底欄` | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。 |
+| 主選單頂部 | `主題` | 可選擇`預設`或`區塊化`。每個主題可宣告衝突設定清單；衝突控制項會停用，原本偏好會保留，切換主題後自動恢復。 |
+| 顯示 | `收合底欄` | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。 |
 | 留言與排序 | `回覆框跟隨留言` | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著把同一個官方 `.c-reply__editor` 節點搬到該則 `.reply-content__footer` 最下方，原位置保留「回到底部留言框」列。點擊該列、關閉功能或改用多樓層標記時會立即還原，無輸入框複製或同步。 |
-| 留言與排序 | `標記強化` | 在官方底部 `.c-reply__editor` 下方顯示含頭像的標記標籤；每個 X 只刪除對應的 `#B樓層:留言ID#`，右側清除按鈕可移除全部標記，且都會同步觸發官方輸入事件。 |
-| 留言與排序 | `顯示標記` | 獨立控制各樓層號的標記互動；Hover 顯示「添加標記」，點擊樓層即可追加多個樓層標記到官方底部輸入框。 |
+| 留言與排序 | `標記優化` | 在官方底部 `.c-reply__editor` 下方顯示含頭像的標記標籤；每個 X 只刪除對應的 `#B樓層:留言ID#`，右側清除按鈕可移除全部標記，且都會同步觸發官方輸入事件。Hover 樓層號會顯示「添加標記」，點擊即可追加多個樓層標記到官方底部輸入框。 |
 | 留言與排序 | `推噓移至右側` | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。 |
 | 圖片 | `縮小預覽` | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。 |
 | 圖片 | `Hover 顯示` | 圖片區塊下的二級選項；游標持續停留 0.5 秒後才模擬原圖的 click，提前移開會取消，沿用論壇既有的圖片放大效果。 |
-| 動作 | `還原預設` | 儲存所有預設值：關閉全部功能、頭像改為預設、排序改為原始。 |
-| 動作 | `推薦設定` | 套用 `content/config/recommended-settings.json` 所宣告的設定組合並儲存。 |
+| 動作 | `還原預設` | 套用並儲存 `content/features/comment-styles/default.js` 所宣告的預設主題設定。 |
 | 動作 | `info` 圖示 | 開啟可由關閉按鈕、遮罩或 Esc 關閉的 Modal，顯示目前版本、Manifest V3 開發資訊與功能簡介。 |
 
 選單中的開關採 switch 視覺，啟用色為 `#117e96`。新增選項時應使用既有的
@@ -159,6 +158,15 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 
 若功能會改變既有 DOM，必須同時實作可逆的 `restore()`；切換功能、還原預設、
 清單重繪時都須能回到論壇原本外觀與順序。
+
+## 主題與功能相容性
+
+- 通用功能只處理自身行為，不得依主題名稱加入 `if (theme === ...)` 等分支。
+- 主題專屬 CSS、版面定位與相容性宣告集中於 `content/features/comment-styles/<theme>.js`。
+- 主題檔中凡是為特定功能加入的設定、CSS 或 DOM 接合，都要在前方以一行中文註解標明功能名稱與接合原因。
+- 每個主題以 `disabledSettings` 列出衝突設定；`comment-styles.js` 依此產生有效設定，`main.js` 套用有效設定，選單則停用衝突控制項。
+- 每個主題可用 `defaultSettings` 宣告切換到該主題時要預設套用的設定值；套用後仍由使用者自行調整。
+- 停用衝突功能時保留使用者原本偏好；切換到相容主題後，設定必須自動恢復。
 
 ## AJAX 與效能
 

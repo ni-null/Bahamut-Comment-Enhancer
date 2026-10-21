@@ -1,5 +1,5 @@
 /**
- * 功能簡介：切換留言 footer 的預設日期與相對時間，例如「3 小時前」。
+ * 功能簡介：切換留言 footer 的預設、完整與相對時間，例如「2026-10-20 16:15:31」或「3 小時前」。
  * 原始顯示文字會保留在資料屬性中，關閉功能時可完整還原。
  */
 (function (window) {
@@ -9,9 +9,15 @@
   var ORIGINAL_TIME_ATTRIBUTE = 'data-comment-thread-original-time';
   var TIME_SELECTOR = '.c-reply__item .reply-content__footer .edittime[data-tippy-content*="留言時間"]';
 
-  function parseTime(element) {
+  function getFullTime(element) {
     var source = element.getAttribute('data-tippy-content') || '';
     var match = source.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+    return match ? match[0] : null;
+  }
+
+  function parseTime(element) {
+    var fullTime = getFullTime(element);
+    var match = fullTime && fullTime.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
     if (!match) return null;
     return new Date(
       Number(match[1]), Number(match[2]) - 1, Number(match[3]),
@@ -37,6 +43,9 @@
       if (mode === 'relative') {
         var date = parseTime(element);
         if (date && !Number.isNaN(date.getTime())) element.textContent = formatRelativeTime(date);
+      } else if (mode === 'full') {
+        // 官方 tooltip 提供秒級時間，原始畫面則可能只顯示「昨天 16:15」。
+        element.textContent = getFullTime(element) || element.getAttribute(ORIGINAL_TIME_ATTRIBUTE);
       } else {
         element.textContent = element.getAttribute(ORIGINAL_TIME_ATTRIBUTE);
         element.removeAttribute(ORIGINAL_TIME_ATTRIBUTE);

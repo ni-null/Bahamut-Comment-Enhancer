@@ -41,8 +41,9 @@
     if (clickHandlers.has(item)) return;
 
     var handler = function (event) {
+      // 右側推噓列在收合時仍可點擊；互動元素不應觸發整則留言展開。
+      if (isInteractiveTarget(event.target)) return;
       var isCollapsed = content.getAttribute(STATE_ATTRIBUTE) === 'collapsed';
-      if (!isCollapsed && isInteractiveTarget(event.target)) return;
       event.preventDefault();
       event.stopPropagation();
       setCollapsed(item, content, !isCollapsed);

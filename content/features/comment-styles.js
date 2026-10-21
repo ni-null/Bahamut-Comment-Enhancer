@@ -57,14 +57,10 @@
     var current = definitions[currentName];
     if (currentName !== nextName && current && typeof current.restore === 'function') current.restore(list);
 
-    if (nextName === 'default') {
-      list.removeAttribute(ATTRIBUTE);
-      return;
-    }
-
     var next = definitions[nextName];
     if (next && typeof next.apply === 'function') next.apply(list);
-    list.setAttribute(ATTRIBUTE, nextName);
+    if (nextName === 'default') list.removeAttribute(ATTRIBUTE);
+    else list.setAttribute(ATTRIBUTE, nextName);
   }
 
   tools.commentStyles = { register: register };

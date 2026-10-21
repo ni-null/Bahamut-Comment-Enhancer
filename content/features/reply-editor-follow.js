@@ -120,7 +120,8 @@
       var button = event.target && event.target.closest && event.target.closest('button.tag');
       if (!button || !/Forum\.C\.replyToFloor\s*\(/.test(button.getAttribute('onclick') || '')) return;
       var host = button.closest('.c-post__footer.c-reply');
-      var item = button.closest(tools.selectors.item);
+      // 階層留言的多樓標記複製節點沒有原始 id；展開分支後仍應可作為回覆框目標。
+      var item = button.closest('.c-reply__item');
       if (!host || !item || !states.has(host)) return;
       // 讓官方 inline onclick 先寫入回覆狀態，再搬移同一個 editor 節點。
       scheduleMove(host, item, getReplyMarker(button), { x: window.scrollX, y: window.scrollY });

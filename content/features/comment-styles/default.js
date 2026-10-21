@@ -2,12 +2,15 @@
  * 功能簡介：預設留言主題及其預設功能組合。
  * 此檔是預設主題的唯一設定來源；首次使用、切回預設主題與還原預設都會套用 defaultSettings。
  */
-(function (window) {
+(function (window, document) {
   'use strict';
 
   var tools = window.BahamutCommentTools;
+  var STYLE_ID = 'comment-thread-default-comment-style';
+  var STYLE_NAME = 'default';
+  var HOST_ATTRIBUTE = 'data-comment-thread-comment-style-host';
   var DEFAULT_THEME = Object.freeze({
-    name: 'default',
+    name: STYLE_NAME,
     label: '預設',
     disabledSettings: [],
     defaultSettings: {
@@ -48,9 +51,32 @@
       // 排序方式：預設保留原始留言順序。
       commentSortMode: 'default'
     },
-    apply: function () {},
-    restore: function () {}
+    apply: apply,
+    restore: restore
   });
 
+  function addStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = [
+      // 回覆框跟隨留言：僅移除已放入留言 footer 的回覆框內距，讓它與留言內容對齊。
+      '.c-post__footer.c-reply[' + HOST_ATTRIBUTE + '="' + STYLE_NAME + '"] .reply-content__footer > .c-reply__editor { padding: 0 !important; }'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  function apply(list) {
+    addStyles();
+    var host = list.closest('.c-post__footer.c-reply');
+    if (host) host.setAttribute(HOST_ATTRIBUTE, STYLE_NAME);
+  }
+
+  function restore(list) {
+    var host = list.closest('.c-post__footer.c-reply');
+    if (host) host.removeAttribute(HOST_ATTRIBUTE);
+  }
+
   tools.commentStyles.register(DEFAULT_THEME.name, DEFAULT_THEME);
-})(window);
+})(window, document);

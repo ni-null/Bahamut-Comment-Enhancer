@@ -17,6 +17,7 @@
     avatarShape: 'round',
     imageSmallPreviewEnabled: false,
     imageHoverPreviewEnabled: false,
+    youtubeLightboxEnabled: true,
     timeDisplay: 'default',
     footerInteractionCollapseEnabled: false,
     replyEditorFollowEnabled: false,
@@ -56,6 +57,9 @@
       imageHoverPreviewEnabled: value && typeof value.imageHoverPreviewEnabled === 'boolean'
         ? value.imageHoverPreviewEnabled
         : DEFAULTS.imageHoverPreviewEnabled,
+      youtubeLightboxEnabled: value && typeof value.youtubeLightboxEnabled === 'boolean'
+        ? value.youtubeLightboxEnabled
+        : DEFAULTS.youtubeLightboxEnabled,
       timeDisplay: value && ['default', 'full', 'relative'].indexOf(value.timeDisplay) !== -1
         ? value.timeDisplay
         : DEFAULTS.timeDisplay,

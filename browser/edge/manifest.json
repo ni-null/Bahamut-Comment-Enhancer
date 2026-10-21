@@ -35,6 +35,7 @@
         "content/features/avatar.js",
         "content/features/floor-avatar.js",
         "content/features/image-preview.js",
+        "content/features/youtube-lightbox.js",
         "content/features/relative-time.js",
         "content/features/footer-collapse.js",
         "content/features/reply-editor-follow.js",

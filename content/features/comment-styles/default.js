@@ -30,6 +30,8 @@
       imageSmallPreviewEnabled: false,
       // 圖片 Hover 顯示：預設不以停懸開啟圖片。
       imageHoverPreviewEnabled: false,
+      // YouTube 燈箱播放：預設直接在留言頁面開啟官方影片。
+      youtubeLightboxEnabled: true,
       // 時間顯示：預設使用相對時間。
       timeDisplay: 'relative',
       // 收合底欄：預設完整顯示互動列。

@@ -474,6 +474,7 @@
     imageGroup.appendChild(createGroupTitle('圖片'));
     imageGroup.appendChild(createMenuToggle('縮小預覽', 'imageSmallPreviewEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('停懸顯示', 'imageHoverPreviewEnabled', state, options.onSettingChange, { secondary: true }));
+    imageGroup.appendChild(createMenuToggle('YouTube 燈箱播放', 'youtubeLightboxEnabled', state, options.onSettingChange, { secondary: true }));
 
     var layout = document.createElement('div');
     layout.className = CONTROL_MENU_CLASS + '__layout';

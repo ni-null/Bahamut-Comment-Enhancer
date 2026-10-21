@@ -46,6 +46,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | `content/features/avatar.js` | 控制留言頭像顯示方式與圓形／方形樣式 | 選單、設定讀寫、AJAX observer |
 | `content/features/floor-avatar.js` | 懸停頭像時以樓層數字覆蓋圖片，並相容還原舊版樓層徽章 | 選單、設定讀寫、頭像顯示模式 |
 | `content/features/image-preview.js` | 控制留言內文圖片縮小預覽與 Hover 時模擬原圖點擊 | 選單、設定讀寫、圖片放大器實作 |
+| `content/features/youtube-lightbox.js` | 將官方 YouTube 影片連結以燈箱 iframe 播放；關閉時卸載播放器 | 選單、設定讀寫、AJAX observer |
 | `content/features/relative-time.js` | 在預設、完整與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
 | `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
 | `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將同一個官方 editor 節點搬到該留言 footer 下方；原位置保留可點擊的回復列，點擊即可搬回底部，因此完全沿用官方 Enter、按鈕與事件 | 回覆內容、官方回覆函式、其他留言功能 |
@@ -129,6 +130,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 | 留言與排序 | `推噓移至右側` | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。 |
 | 圖片 | `縮小預覽` | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。 |
 | 圖片 | `Hover 顯示` | 圖片區塊下的二級選項；游標持續停留 0.5 秒後才模擬原圖的 click，提前移開會取消，沿用論壇既有的圖片放大效果。 |
+| 圖片 | `YouTube 燈箱播放` | 攔截官方產生的 YouTube 影片預覽連結，在頁面燈箱中以 `youtube-nocookie.com` iframe 播放；Esc、關閉按鈕或點擊遮罩時會立即卸載播放器。Ctrl／Cmd／Shift／Alt 與中鍵點擊仍會依原連結另開分頁。 |
 | 動作 | `還原預設` | 套用並儲存 `content/features/comment-styles/default.js` 所宣告的預設主題設定。 |
 | 動作 | `info` 圖示 | 開啟可由關閉按鈕、遮罩或 Esc 關閉的 Modal，顯示目前版本、Manifest V3 開發資訊與功能簡介。 |
 

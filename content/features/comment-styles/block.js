@@ -23,7 +23,9 @@
       // 收合階層：區塊化卡片預設先收起回覆分支。
       collapseThreadingEnabled: true,
       // 區塊化主題會將跟隨的回覆框排在互動列下方。
-      replyEditorFollowEnabled: true
+      replyEditorFollowEnabled: true,
+      // YouTube 燈箱播放：區塊化留言也沿用頁面內影片播放。
+      youtubeLightboxEnabled: true
     }
   });
   var STYLE_ID = 'comment-thread-block-comment-style';

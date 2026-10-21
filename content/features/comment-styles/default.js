@@ -16,10 +16,10 @@
     defaultSettings: {
       // 階層留言：預設以父子關係重組留言。
       threadingEnabled: true,
-      // 階層分隔線：預設顯示子留言的連接線。
-      showThreadSeparators: true,
-      // 收合階層：預設直接顯示回覆分支。
-      collapseThreadingEnabled: false,
+      // 階層分隔線：預設隱藏子留言的連接線。
+      showThreadSeparators: false,
+      // 收合階層：預設先收起回覆分支。
+      collapseThreadingEnabled: true,
       // 用戶名至底：預設維持作者位於留言上方。
       userNameAtBottomEnabled: false,
       // 頭像大小：預設使用論壇原始尺寸。

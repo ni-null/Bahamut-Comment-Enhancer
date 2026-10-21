@@ -130,15 +130,21 @@ function createUserscriptHeader(metadata, version) {
 async function buildUserscript() {
   var metadata = JSON.parse(fs.readFileSync(path.join(BROWSER_DIRECTORY, 'tampermonkey', 'metadata.json'), 'utf8'));
   var manifest = getManifest('chrome');
-  var scriptPath = path.join(DIST_DIRECTORY, 'bahamut-comment-enhancer.user.js');
+  var minifiedPath = path.join(DIST_DIRECTORY, 'bahamut-comment-enhancer.user.js');
+  var readablePath = path.join(DIST_DIRECTORY, 'bahamut-comment-enhancer.unminified.user.js');
+  var header = createUserscriptHeader(metadata, manifest.version);
+  var minifiedSource = [header];
+  var readableSource = [header];
 
-  var source = [createUserscriptHeader(metadata, manifest.version)];
   for (var index = 0; index < getContentScriptPaths().length; index += 1) {
     var relativePath = getContentScriptPaths()[index];
-    source.push(await minifyJavaScript(fs.readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8'), relativePath));
+    var source = fs.readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8');
+    readableSource.push(source);
+    minifiedSource.push(await minifyJavaScript(source, relativePath));
   }
-  fs.writeFileSync(scriptPath, source.join('\n\n'), 'utf8');
-  return scriptPath;
+  fs.writeFileSync(minifiedPath, minifiedSource.join('\n\n'), 'utf8');
+  fs.writeFileSync(readablePath, readableSource.join('\n\n'), 'utf8');
+  return { minifiedPath: minifiedPath, readablePath: readablePath };
 }
 
 function createCrcTable() {
@@ -238,7 +244,9 @@ function packageExtension(target, sourceDirectory) {
 
 async function buildTarget(target, shouldPackage) {
   if (target === 'tampermonkey') {
-    console.log('已建立 Tampermonkey userscript：' + path.relative(PROJECT_ROOT, await buildUserscript()));
+    var userscripts = await buildUserscript();
+    console.log('已建立 Tampermonkey 壓縮版：' + path.relative(PROJECT_ROOT, userscripts.minifiedPath));
+    console.log('已建立 Tampermonkey 未壓縮版：' + path.relative(PROJECT_ROOT, userscripts.readablePath));
     return;
   }
   var outputPath = await buildExtension(target);

@@ -100,6 +100,7 @@
       '  .' + CONTROL_MENU_CLASS + '__group { grid-template-columns: minmax(0, 1fr); }',
       '}',
       '.' + CONTROL_MENU_CLASS + '__subitem { padding-left: 3px; font-size: .92em; }',
+      '.' + CONTROL_MENU_CLASS + '__item.is-hidden { display: none !important; }',
       '.' + CONTROL_MENU_CLASS + '__item.is-disabled { opacity: .5; cursor: default; }',
       '.' + CONTROL_MENU_CLASS + '__switch {',
       '  position: absolute; width: 1px; height: 1px; margin: -1px; opacity: 0;',
@@ -515,16 +516,21 @@
       var disabledByStyle = disabledSettings.indexOf(toggle.dataset.commentThreadSetting) !== -1;
       toggle.disabled = (isThreadingChild && !state.threadingEnabled) || disabledByStyle;
       var toggleLabel = toggle.closest('label');
-      toggleLabel.classList.toggle('is-disabled', toggle.disabled);
-      toggleLabel.title = disabledByStyle ? '目前樣式不支援此功能' : '';
+      // 主題衝突的功能不應佔用選單版面；階層留言未開啟的次選項則維持可見但停用。
+      toggleLabel.hidden = false;
+      toggleLabel.classList.toggle('is-hidden', disabledByStyle);
+      toggleLabel.classList.toggle('is-disabled', toggle.disabled && !disabledByStyle);
+      toggleLabel.title = '';
     });
     Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__select'), function (select) {
       select.value = state[select.dataset.commentThreadSetting];
       var disabledByStyle = disabledSettings.indexOf(select.dataset.commentThreadSetting) !== -1;
       select.disabled = disabledByStyle;
       var selectLabel = select.closest('label');
-      selectLabel.classList.toggle('is-disabled', disabledByStyle);
-      selectLabel.title = disabledByStyle ? '目前樣式不支援此功能' : '';
+      selectLabel.hidden = false;
+      selectLabel.classList.toggle('is-hidden', disabledByStyle);
+      selectLabel.classList.toggle('is-disabled', false);
+      selectLabel.title = '';
     });
   }
 

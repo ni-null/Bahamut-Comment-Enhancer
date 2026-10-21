@@ -18,6 +18,10 @@
       'reactionInlineEnabled'
     ],
     defaultSettings: {
+      // 階層分隔線：區塊化卡片預設不顯示子留言連接線。
+      showThreadSeparators: false,
+      // 收合階層：區塊化卡片預設先收起回覆分支。
+      collapseThreadingEnabled: true,
       // 區塊化主題會將跟隨的回覆框排在互動列下方。
       replyEditorFollowEnabled: true
     }
@@ -37,7 +41,8 @@
       '.c-post__footer.c-reply[' + HOST_ATTRIBUTE + '="' + STYLE_NAME + '"] { padding: 10px; }',
       SCOPE + ' { --comment-thread-block-border: rgba(88, 112, 112, .2); --comment-thread-block-muted: #718080; --comment-thread-block-accent: #117e96; }',
       SCOPE + ' > .c-reply__item,',
-      SCOPE + ' .comment-thread-children > .c-reply__item {',
+      // 階層留言：收合動畫在子容器加上 inner 包裝層，二、三級留言卡片需套用至該層的直屬項目。
+      SCOPE + ' .comment-thread-children > .comment-thread-children__inner > .c-reply__item {',
       '  position: relative; margin: 10px 0; padding: 14px 16px; border: 1px solid var(--comment-thread-block-border);',
       '  border-radius: 14px; background: Canvas; color: CanvasText; box-shadow: 0 1px 2px rgba(20, 40, 40, .08);',
       '}',
@@ -84,7 +89,7 @@
       SCOPE + ' .reply-content__footer .buttonbar > button:hover,',
       SCOPE + ' .reply-content__footer .buttonbar > a:hover { background: rgba(17,126,150,.1); color: var(--comment-thread-block-accent); }',
       '@media (max-width: 600px) {',
-      '  ' + SCOPE + ' > .c-reply__item, ' + SCOPE + ' .comment-thread-children > .c-reply__item { padding: 12px; border-radius: 12px; }',
+      '  ' + SCOPE + ' > .c-reply__item, ' + SCOPE + ' .comment-thread-children > .comment-thread-children__inner > .c-reply__item { padding: 12px; border-radius: 12px; }',
       '  ' + SCOPE + ' .c-reply__item > div { grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; }',
       '  ' + SCOPE + ' .c-reply__item > div > a.reply-avatar.user--sm { width: 34px; height: 34px; min-width: 34px; min-height: 34px; }',
       '  ' + SCOPE + ' .comment-thread-children > .comment-thread-children__inner { margin-left: 10px; padding-left: 14px; }',

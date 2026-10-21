@@ -48,7 +48,7 @@ node browser/build.js all --package
 ```
 
 建置只會壓縮 `dist/` 的發佈檔，開發原始碼維持可讀。每次建置都會清空舊的 `dist/`，在
-`all --package` 下僅留下 Chrome、Edge、Firefox 三個 ZIP 與一個 Tampermonkey `.user.js`。採用 Terser 的一般壓縮與變數縮短，
+`all --package` 下會產生 Chrome、Edge、Firefox 三個 ZIP，以及壓縮與未壓縮兩份 Tampermonkey `.user.js`。採用 Terser 的一般壓縮與變數縮短，
 不使用混淆、動態執行或遠端程式碼，符合一般瀏覽器商店的可審查發佈方式。
 
 各平台指令、輸出位置與發佈用途請見 [browser/README.md](browser/README.md)。

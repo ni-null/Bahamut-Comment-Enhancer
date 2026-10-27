@@ -36,35 +36,35 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 
 ## 模組責任
 
-| 檔案 | 責任 | 不應放入 |
-| --- | --- | --- |
-| `content/core/comment-parser.js` | 選擇器、留言 ID、單一或多個回覆父 ID 的解析 | DOM 重排、設定讀寫、UI |
-| `content/core/structure-validator.js` | 驗證官方留言容器、清單與展開／未展開結構，回傳可安全掛載的容器與原因 | DOM 修改、選單顯示、功能套用 |
-| `content/features/threading.js` | 最多三層的留言階層化與攤平；多重標註時為每個父留言建立視覺副本 | 選單、儲存、AJAX 觀察器 |
-| `content/features/sorting.js` | 提供原始與熱門度比較器；僅階層模式會以 0.6 權重將子分支熱門度回饋父分支 | 選單、儲存 |
-| `content/features/username-footer.js` | 將用戶名移至 footer 的樓層號後方，並以 placeholder 還原原位置與樣式 | 留言階層、設定讀寫 |
-| `content/features/avatar.js` | 控制留言頭像顯示方式與圓形／方形樣式 | 選單、設定讀寫、AJAX observer |
-| `content/features/floor-avatar.js` | 懸停頭像時以樓層數字覆蓋圖片，並相容還原舊版樓層徽章 | 選單、設定讀寫、頭像顯示模式 |
-| `content/features/image-preview.js` | 控制留言內文圖片縮小預覽與 Hover 時模擬原圖點擊 | 選單、設定讀寫、圖片放大器實作 |
-| `content/features/image-lightbox.js` | 以自訂燈箱取代官方 Photoswipe 圖片預覽，支援點擊關閉與滾輪縮放 | 選單、設定讀寫、官方圖片燈箱 |
-| `content/features/youtube-lightbox.js` | 將官方 YouTube 影片連結以燈箱 iframe 播放；關閉時卸載播放器 | 選單、設定讀寫、AJAX observer |
-| `content/features/comment-area-height.js` | 限制 `Commendlist` 留言清單高度並顯示淡化垂直捲軸；保留原始 inline style 以便還原 | 選單、設定讀寫、留言內容 |
-| `content/features/relative-time.js` | 在預設、完整與相對時間間切換，並保留原始文字以供還原 | 選單、設定讀寫、AJAX observer |
-| `content/features/footer-collapse.js` | 摺疊整個 footer，並點擊留言非互動區切換收合 | 選單、設定讀寫、留言內容解析 |
-| `content/features/reply-editor-follow.js` | 先讓官方回覆流程寫入標記，再將同一個官方 editor 節點搬到該留言 footer 下方；原位置保留可點擊的回復列，點擊即可搬回底部，因此完全沿用官方 Enter、按鈕與事件 | 回覆內容、官方回覆函式、其他留言功能 |
-| `content/features/marker-enhancement.js` | 在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部，並讓各樓層號可追加標記 | 官方輸入框內容、回覆送出流程 |
-| `content/features/reaction-inline.js` | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原 | 選單、設定讀寫、推噓事件實作 |
-| `content/features/reply-annotation.js` | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記 | 階層開關與選單狀態 |
-| `content/features/auto-expand-page.js` | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果 | 外掛 UI、留言 DOM 處理 |
-| `content/features/auto-expand.js` | 以 `IntersectionObserver` 等待留言區接近可視範圍後，解析官方展開連結的參數並透過 MAIN-world 橋接請求 `extendComment()`；處理回應、逾時與錯誤，不呼叫 `foldedComment()` | 官方留言載入流程 |
-| `content/features/hide-hot-tag.js` | 以擴充功能屬性隱藏或還原官方 `.comment_hot-tag`，不修改原始留言內容 | 選單、設定讀寫 |
-| `content/features/comment-styles.js` | 註冊、切換、還原留言樣式，並依各樣式的 `disabledSettings` 產生有效設定與 `defaultSettings` 套用主題預設；樣式實作位於 `content/features/comment-styles/` | 個別樣式的 CSS、論壇留言內容 |
-| `content/features/comment-styles/default.js` | 預設主題及預設功能組合；首次使用與還原預設時套用 | 設定讀寫、其他樣式 |
-| `content/features/comment-styles/block.js` | 區塊化留言卡片樣式：第一列作者、樓層與時間，第二列標記與內容，第三列互動；以 `disabledSettings` 停用與版面衝突的功能，並以 `defaultSettings` 預設開啟回覆框跟隨留言 | 設定讀寫、其他樣式 |
-| `content/ui/info-modal.js` | 顯示版本、介紹與文件說明的資訊 Modal | 留言功能、設定讀寫、AJAX observer |
-| `content/ui/control-menu.js` | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作 | 設定儲存、留言功能套用 |
-| `content/services/settings.js` | `chrome.storage.local` 的 schema、預設值、讀寫與容錯 | 頁面 DOM |
-| `content/main.js` | 設定狀態協調、功能組合、低成本 AJAX observer 與 UI 回呼 | 選單、Modal、留言關聯解析細節 |
+| 檔案                                         | 責任                                                                                                                                                                   | 不應放入                             |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `content/core/comment-parser.js`             | 選擇器、留言 ID、單一或多個回覆父 ID 的解析                                                                                                                            | DOM 重排、設定讀寫、UI               |
+| `content/core/structure-validator.js`        | 驗證官方留言容器、清單與展開／未展開結構，回傳可安全掛載的容器與原因                                                                                                   | DOM 修改、選單顯示、功能套用         |
+| `content/features/threading.js`              | 最多三層的留言階層化與攤平；多重標註時為每個父留言建立視覺副本                                                                                                         | 選單、儲存、AJAX 觀察器              |
+| `content/features/sorting.js`                | 提供原始與熱門度比較器；僅階層模式會以 0.6 權重將子分支熱門度回饋父分支                                                                                                | 選單、儲存                           |
+| `content/features/username-footer.js`        | 將用戶名移至 footer 的樓層號後方，並以 placeholder 還原原位置與樣式                                                                                                    | 留言階層、設定讀寫                   |
+| `content/features/avatar.js`                 | 控制留言頭像顯示方式與圓形／方形樣式                                                                                                                                   | 選單、設定讀寫、AJAX observer        |
+| `content/features/floor-avatar.js`           | 懸停頭像時以樓層數字覆蓋圖片，並相容還原舊版樓層徽章                                                                                                                   | 選單、設定讀寫、頭像顯示模式         |
+| `content/features/image-preview.js`          | 控制留言內文圖片縮小預覽                                                                                                                                               | 選單、設定讀寫、圖片放大器實作       |
+| `content/features/image-lightbox.js`         | 以自訂燈箱取代官方 Photoswipe 圖片預覽，支援點擊關閉與滾輪縮放                                                                                                         | 選單、設定讀寫、官方圖片燈箱         |
+| `content/features/youtube-lightbox.js`       | 將官方 YouTube 影片連結以燈箱 iframe 播放；關閉時卸載播放器                                                                                                            | 選單、設定讀寫、AJAX observer        |
+| `content/features/comment-area-height.js`    | 限制 `Commendlist` 留言清單高度並顯示淡化垂直捲軸；保留原始 inline style 以便還原                                                                                      | 選單、設定讀寫、留言內容             |
+| `content/features/relative-time.js`          | 在預設、完整與相對時間間切換，並保留原始文字以供還原                                                                                                                   | 選單、設定讀寫、AJAX observer        |
+| `content/features/footer-collapse.js`        | 摺疊整個 footer，並點擊留言非互動區切換收合                                                                                                                            | 選單、設定讀寫、留言內容解析         |
+| `content/features/reply-editor-follow.js`    | 先讓官方回覆流程寫入標記，再將同一個官方 editor 節點搬到該留言 footer 下方；原位置保留可點擊的回復列，點擊即可搬回底部，因此完全沿用官方 Enter、按鈕與事件             | 回覆內容、官方回覆函式、其他留言功能 |
+| `content/features/marker-enhancement.js`     | 在官方底部編輯器下方強化 `#B樓層:留言ID#` 標記：含頭像與留言內容 Hover 預覽、單一 X 刪除與清除全部，並讓各樓層號可追加標記                                             | 官方輸入框內容、回覆送出流程         |
+| `content/features/reaction-inline.js`        | 將原生推、推數、噓、噓數移至留言內容右側，並可依 placeholder 還原                                                                                                      | 選單、設定讀寫、推噓事件實作         |
+| `content/features/reply-annotation.js`       | 階層模式下隱藏內容開頭所有連續的 `B樓層(用戶名)` 回覆樓層標注，不隱藏單獨名稱標記                                                                                      | 階層開關與選單狀態                   |
+| `content/features/auto-expand-page.js`       | 在 MAIN world 以 try/catch 呼叫論壇官方 `extendComment(bsn, snB)`，並用 DOM 事件回傳結果                                                                               | 外掛 UI、留言 DOM 處理               |
+| `content/features/auto-expand.js`            | 以 `IntersectionObserver` 等待留言區接近可視範圍後，解析官方展開連結的參數並透過 MAIN-world 橋接請求 `extendComment()`；處理回應、逾時與錯誤，不呼叫 `foldedComment()` | 官方留言載入流程                     |
+| `content/features/hide-hot-tag.js`           | 以擴充功能屬性隱藏或還原官方 `.comment_hot-tag`，不修改原始留言內容                                                                                                    | 選單、設定讀寫                       |
+| `content/features/comment-styles.js`         | 註冊、切換、還原留言樣式，並依各樣式的 `disabledSettings` 產生有效設定與 `defaultSettings` 套用主題預設；樣式實作位於 `content/features/comment-styles/`               | 個別樣式的 CSS、論壇留言內容         |
+| `content/features/comment-styles/default.js` | 預設主題及預設功能組合；首次使用與還原預設時套用                                                                                                                       | 設定讀寫、其他樣式                   |
+| `content/features/comment-styles/block.js`   | 區塊化留言卡片樣式：第一列作者、樓層與時間，第二列標記與內容，第三列互動；以 `disabledSettings` 停用與版面衝突的功能，並以 `defaultSettings` 預設開啟回覆框跟隨留言    | 設定讀寫、其他樣式                   |
+| `content/ui/info-modal.js`                   | 顯示版本、介紹與文件說明的資訊 Modal                                                                                                                                   | 留言功能、設定讀寫、AJAX observer    |
+| `content/ui/control-menu.js`                 | 齒輪主選單、開關／下拉控制項、外部點擊關閉與還原預設動作                                                                                                               | 設定儲存、留言功能套用               |
+| `content/services/settings.js`               | `chrome.storage.local` 的 schema、預設值、讀寫與容錯                                                                                                                   | 頁面 DOM                             |
+| `content/main.js`                            | 設定狀態協調、功能組合、低成本 AJAX observer 與 UI 回呼                                                                                                                | 選單、Modal、留言關聯解析細節        |
 
 ## 設定 schema
 
@@ -80,7 +80,6 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
   "avatarDisplay": "default",
   "avatarShape": "round",
   "imageSmallPreviewEnabled": false,
-  "imageHoverPreviewEnabled": false,
   "imageLightboxEnabled": true,
   "youtubeLightboxEnabled": true,
   "commentAreaHeightMode": "unlimited",
@@ -119,28 +118,27 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 齒輪選單會顯示「驗證失敗，功能暫時停用」。容器的直屬節點或 `class`／`id` 改變時會重新驗證；
 若原本已套用功能，會先還原再停用。
 
-| 群組 | 控制項 | 行為 |
-| --- | --- | --- |
-| 階層留言 | `階層留言` | 最多三層；關閉時會攤平回原本 DOM 順序。 |
-| 留言與排序 | `自動展開所有留言` | 留言區進入視窗上下 600px 的預載範圍時，才解析官方「顯示較早留言」控制項的 `bsn`、`snB` 並直接呼叫網站的 `extendComment()`；具錯誤與逾時保護，且不呼叫 `foldedComment()`，不會干預使用者手動收合。 |
-| 階層留言 | 右側設定按鈕 | 展開專用設定後，可切換「遮蔽樓層標注」、「顯示階層分隔線」與「收合階層」；收合階層只在第一層留言的卡片底部顯示收合列，以回覆者頭像堆疊、回覆數與最新時間提示討論串，展開後會顯示整個回覆分支。所有次選項僅階層留言開啟時可操作，關閉階層時不刪除其偏好值。 |
-| 排序 | `原始`、`熱門排序` | 獨立於階層功能；原始排序還原初見的留言順序。 |
-| 顯示 | `用戶名至底` | 將 `.reply-content__user` 放在 `name="comment_floor"` 的樓層號後方，套用 `float: left`、右側 `5px` 間距、12px 與灰色文字。 |
-| 顯示 | `頭像樣式`右側設定按鈕 | 展開專用設定後，可調整頭像大小、圓形／方形與停懸顯示樓層；停懸時以 `name="comment_floor"` 的樓層數字覆蓋頭像，footer 的原始樓層仍維持顯示。 |
-| 顯示 | `時間顯示` | `預設時間`、`完整時間`（由 `data-tippy-content` 取出秒級時間）或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。 |
-| 顯示 | `隱藏 HOT 標籤` | 隱藏官方留言上的 `HOT` 標籤；關閉後立即還原。 |
-| 顯示 | `留言區高度` | 限制 `#Commendlist_*` 的最大高度，可選不限制、480px、720px 或自訂 120–5000px；內容超出時顯示垂直捲軸與 10px 內距。若有官方 `.c-reply__head`，外掛控制列會直接附加其中；否則附加於外層留言容器。 |
-| 主選單頂部 | `主題` | 可選擇`預設`或`區塊化`。每個主題可宣告衝突設定清單；衝突控制項會隱藏，原本偏好會保留，切換主題後自動恢復。 |
-| 顯示 | `收合底欄` | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。 |
-| 留言與排序 | `回覆框跟隨留言` | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著把同一個官方 `.c-reply__editor` 節點搬到該則 `.reply-content__footer` 最下方，原位置保留「回到底部留言框」列。點擊該列、關閉功能或改用多樓層標記時會立即還原，無輸入框複製或同步。 |
-| 留言與排序 | `標記優化` | 在官方底部 `.c-reply__editor` 下方顯示含頭像的標記標籤；每個 X 只刪除對應的 `#B樓層:留言ID#`，右側清除按鈕可移除全部標記，且都會同步觸發官方輸入事件。Hover 樓層號會顯示「添加標記」，點擊即可追加多個樓層標記到官方底部輸入框。 |
-| 留言與排序 | `推噓移至右側` | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。 |
-| 圖片 | `縮小預覽` | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。 |
-| 圖片 | `Hover 顯示` | 圖片區塊下的二級選項；游標持續停留 0.5 秒後才模擬原圖的 click，提前移開會取消，沿用論壇既有的圖片放大效果。 |
-| 圖片 | `自訂圖片燈箱` | 攔截官方 `.photoswipe-image`，以自訂燈箱顯示沒有 `w` 寬度限制的圖片網址；點圖片或遮罩即可關閉，滾輪可在 25% 至 800% 間縮放。修飾鍵與中鍵仍保留另開原圖。 |
-| 圖片 | `YouTube 燈箱播放` | 攔截官方產生的 YouTube 影片預覽連結，在頁面燈箱中以 `youtube-nocookie.com` iframe 播放；Esc、關閉按鈕或點擊遮罩時會立即卸載播放器。Ctrl／Cmd／Shift／Alt 與中鍵點擊仍會依原連結另開分頁。 |
-| 動作 | `還原預設` | 套用並儲存 `content/features/comment-styles/default.js` 所宣告的預設主題設定。 |
-| 動作 | `info` 圖示 | 開啟可由關閉按鈕、遮罩或 Esc 關閉的 Modal，顯示目前版本、Manifest V3 開發資訊與功能簡介。 |
+| 群組       | 控制項                 | 行為                                                                                                                                                                                                                                                           |
+| ---------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 階層留言   | `階層留言`             | 最多三層；關閉時會攤平回原本 DOM 順序。                                                                                                                                                                                                                        |
+| 留言與排序 | `自動展開所有留言`     | 留言區進入視窗上下 600px 的預載範圍時，才解析官方「顯示較早留言」控制項的 `bsn`、`snB` 並直接呼叫網站的 `extendComment()`；具錯誤與逾時保護，且不呼叫 `foldedComment()`，不會干預使用者手動收合。                                                              |
+| 階層留言   | 右側設定按鈕           | 展開專用設定後，可切換「遮蔽樓層標注」、「顯示階層分隔線」與「收合階層」；收合階層只在第一層留言的卡片底部顯示收合列，以回覆者頭像堆疊、回覆數與最新時間提示討論串，展開後會顯示整個回覆分支。所有次選項僅階層留言開啟時可操作，關閉階層時不刪除其偏好值。     |
+| 排序       | `原始`、`熱門排序`     | 獨立於階層功能；原始排序還原初見的留言順序。                                                                                                                                                                                                                   |
+| 顯示       | `用戶名至底`           | 將 `.reply-content__user` 放在 `name="comment_floor"` 的樓層號後方，套用 `float: left`、右側 `5px` 間距、12px 與灰色文字。                                                                                                                                     |
+| 顯示       | `頭像樣式`右側設定按鈕 | 展開專用設定後，可調整頭像大小、圓形／方形與停懸顯示樓層；停懸時以 `name="comment_floor"` 的樓層數字覆蓋頭像，footer 的原始樓層仍維持顯示。                                                                                                                    |
+| 顯示       | `時間顯示`             | `預設時間`、`完整時間`（由 `data-tippy-content` 取出秒級時間）或`相對時間`（例如 `3 小時前`）；相對時間啟用時每分鐘更新一次。                                                                                                                                  |
+| 顯示       | `隱藏 HOT 標籤`        | 隱藏官方留言上的 `HOT` 標籤；關閉後立即還原。                                                                                                                                                                                                                  |
+| 顯示       | `留言區高度`           | 限制 `#Commendlist_*` 的最大高度，可選不限制、480px、720px 或自訂 120–5000px；內容超出時顯示垂直捲軸與 10px 內距。若有官方 `.c-reply__head`，外掛控制列會直接附加其中；否則附加於外層留言容器。                                                                |
+| 主選單頂部 | `主題`                 | 可選擇`預設`或`區塊化`。每個主題可宣告衝突設定清單；衝突控制項會隱藏，原本偏好會保留，切換主題後自動恢復。                                                                                                                                                     |
+| 顯示       | `收合底欄`             | 收起整個 `.reply-content__footer`；點擊留言非互動區可展開或再次收合，推噓、回覆、連結、頭像與圖片仍保留原本操作。                                                                                                                                              |
+| 留言與排序 | `回覆框跟隨留言`       | 點擊官方「回覆」時，先讓網站完成回覆流程，再正規化為本次唯一樓層標記；接著把同一個官方 `.c-reply__editor` 節點搬到該則 `.reply-content__footer` 最下方，原位置保留「切換到底部留言框」列。點擊該列、關閉功能或改用多樓層標記時會立即還原，無輸入框複製或同步。 |
+| 留言與排序 | `標記優化`             | 在官方底部 `.c-reply__editor` 下方顯示含頭像的標記標籤；每個 X 只刪除對應的 `#B樓層:留言ID#`，右側清除按鈕可移除全部標記，且都會同步觸發官方輸入事件。Hover 樓層號會顯示「添加標記」，點擊即可追加多個樓層標記到官方底部輸入框。                               |
+| 留言與排序 | `推噓移至右側`         | 搬移原生的推、推數、噓、噓數到 `.reply-content` 右側；不複製節點，因此沿用論壇的推噓事件與即時計數，關閉時完整還原到 buttonbar。                                                                                                                               |
+| 圖片       | `縮小預覽`             | 圖片區塊下的二級選項；對留言內文的圖片加上 `max-width: 28px` 與 `max-height: 28px`。                                                                                                                                                                           |
+| 圖片       | `自訂圖片燈箱`         | 攔截官方 `.photoswipe-image`，以自訂燈箱顯示沒有 `w` 寬度限制的圖片網址；點圖片或遮罩即可關閉，滾輪可在 25% 至 800% 間縮放。修飾鍵與中鍵仍保留另開原圖。                                                                                                       |
+| 圖片       | `YouTube 燈箱播放`     | 攔截官方產生的 YouTube 影片預覽連結，在頁面燈箱中以 `youtube-nocookie.com` iframe 播放；Esc、關閉按鈕或點擊遮罩時會立即卸載播放器。Ctrl／Cmd／Shift／Alt 與中鍵點擊仍會依原連結另開分頁。                                                                      |
+| 動作       | `還原預設`             | 套用並儲存 `content/features/comment-styles/default.js` 所宣告的預設主題設定。                                                                                                                                                                                 |
+| 動作       | `info` 圖示            | 開啟可由關閉按鈕、遮罩或 Esc 關閉的 Modal，顯示目前版本、Manifest V3 開發資訊與功能簡介。                                                                                                                                                                      |
 
 選單中的開關採 switch 視覺，啟用色為 `#117e96`。新增選項時應使用既有的
 `comment-thread-control-menu` 結構與 class，避免覆蓋論壇原有按鈕樣式。
@@ -197,7 +195,7 @@ GitHub Pages 原始頁面位於 `docs/`：`index.html` 會導向 `privacy-policy
 3. 分別切換每個功能後重整頁面，確認儲存的設定會直接生效。
 4. 開啟／關閉階層留言，確認最多三層、關閉後會還原平面順序；一則同時標註多個已載入樓層的留言，應在每個被標註樓層下顯示一份，並確認遮蔽樓層標注僅於階層模式生效。
 5. 在平面模式驗證熱門排序只看本身讚數；在階層模式驗證熱門子留言會以 0.6 權重提升父分支。
-6. 測試用戶名是否位於 `B33` 等樓層號後方、頭像顯示與圓形／方形樣式、樓層徽章位置、圖片縮小與 Hover 顯示、預設／相對時間切換、互動區摺疊與展開；並確認推、推數、噓、噓數可移至留言右側且關閉後完整回到 buttonbar。
+6. 測試用戶名是否位於 `B33` 等樓層號後方、頭像顯示與圓形／方形樣式、樓層徽章位置、圖片縮小預覽、預設／相對時間切換、互動區摺疊與展開；並確認推、推數、噓、噓數可移至留言右側且關閉後完整回到 buttonbar。
 7. 使用「還原預設」，確認所有功能關閉、頭像回預設、排序回原始。
 8. 開啟「自動展開所有留言」，確認會依序載入每一批較早留言至控制項消失；關閉時不再觸發官方展開按鈕。
 9. 點擊選單外部確認自動關閉；載入舊留言或發送／接收 AJAX 新留言，確認新留言沿用目前設定。

@@ -540,7 +540,6 @@
     imageGroup.className = CONTROL_MENU_CLASS + '__group';
     imageGroup.appendChild(createGroupTitle('圖片'));
     imageGroup.appendChild(createMenuToggle('縮小預覽', 'imageSmallPreviewEnabled', state, options.onSettingChange, { secondary: true }));
-    imageGroup.appendChild(createMenuToggle('停懸顯示', 'imageHoverPreviewEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('自訂圖片燈箱', 'imageLightboxEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('YouTube 燈箱播放', 'youtubeLightboxEnabled', state, options.onSettingChange, { secondary: true }));
 

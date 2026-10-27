@@ -40,7 +40,7 @@
     var effectiveState = getEffectiveState();
     return effectiveState.threadingEnabled || effectiveState.userNameAtBottomEnabled ||
       effectiveState.avatarDisplay !== 'default' || effectiveState.imageSmallPreviewEnabled ||
-      effectiveState.imageHoverPreviewEnabled || effectiveState.timeDisplay !== 'default' ||
+      effectiveState.timeDisplay !== 'default' ||
       effectiveState.footerInteractionCollapseEnabled || effectiveState.floorAtAvatarEnabled ||
       effectiveState.reactionInlineEnabled || effectiveState.markerEnhancementEnabled ||
       effectiveState.avatarShape !== 'round' || effectiveState.commentSortMode !== 'default' ||
@@ -154,7 +154,7 @@
 
       avatar.apply(list, effectiveState.avatarDisplay, effectiveState.avatarShape);
       floorAvatar.apply(list, effectiveState.floorAtAvatarEnabled);
-      imagePreview.apply(list, effectiveState.imageSmallPreviewEnabled, effectiveState.imageHoverPreviewEnabled);
+      imagePreview.apply(list, effectiveState.imageSmallPreviewEnabled);
       imageLightbox.apply(list, effectiveState.imageLightboxEnabled);
       youtubeLightbox.apply(list, effectiveState.youtubeLightboxEnabled);
       commentAreaHeight.apply(list, effectiveState.commentAreaHeightMode, effectiveState.commentAreaCustomHeight);

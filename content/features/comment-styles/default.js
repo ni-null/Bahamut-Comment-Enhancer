@@ -28,8 +28,6 @@
       avatarShape: 'round',
       // 圖片縮小預覽：預設不縮小留言圖片。
       imageSmallPreviewEnabled: false,
-      // 圖片 Hover 顯示：預設不以停懸開啟圖片。
-      imageHoverPreviewEnabled: false,
       // 自訂圖片燈箱：預設以頁面內圖片燈箱取代官方預覽。
       imageLightboxEnabled: true,
       // YouTube 燈箱播放：預設直接在留言頁面開啟官方影片。

@@ -172,7 +172,6 @@
     if (list[HANDLER_KEY]) return;
     var handler = function (event) {
       var link = event.target.closest(LINK_SELECTOR);
-      // imagePreview 的 Hover 顯示會派發合成 click，仍交由官方行為處理。
       if (!event.isTrusted || !link || !list.contains(link) || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
       event.stopPropagation();

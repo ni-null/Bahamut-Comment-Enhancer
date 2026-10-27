@@ -16,7 +16,6 @@
     avatarDisplay: 'default',
     avatarShape: 'round',
     imageSmallPreviewEnabled: false,
-    imageHoverPreviewEnabled: false,
     imageLightboxEnabled: true,
     youtubeLightboxEnabled: true,
     commentAreaHeightMode: 'unlimited',
@@ -57,9 +56,6 @@
       imageSmallPreviewEnabled: value && typeof value.imageSmallPreviewEnabled === 'boolean'
         ? value.imageSmallPreviewEnabled
         : DEFAULTS.imageSmallPreviewEnabled,
-      imageHoverPreviewEnabled: value && typeof value.imageHoverPreviewEnabled === 'boolean'
-        ? value.imageHoverPreviewEnabled
-        : DEFAULTS.imageHoverPreviewEnabled,
       imageLightboxEnabled: value && typeof value.imageLightboxEnabled === 'boolean'
         ? value.imageLightboxEnabled
         : DEFAULTS.imageLightboxEnabled,

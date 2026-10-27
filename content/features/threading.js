@@ -71,6 +71,44 @@
     });
   }
 
+  function moveTooltipRootOutsideThread(root) {
+    if (!root.matches('[data-tippy-root]') ||
+      !root.closest('.' + CHILDREN_INNER_CLASS) || !document.body) return;
+
+    // Tippy 會把選單插在觸發按鈕附近；階層留言內層為了收合動畫使用 overflow:hidden，
+    // 會裁切選單。移至 body 可保留原定位，同時避開階層容器與留言清單的裁切範圍。
+    document.body.appendChild(root);
+  }
+
+  function moveNestedTooltipRoots(nodes) {
+    nodes.forEach(function (node) {
+      if (node.nodeType !== 1) return;
+      if (node.matches('[data-tippy-root]')) moveTooltipRootOutsideThread(node);
+      Array.prototype.forEach.call(node.querySelectorAll('[data-tippy-root]'), function (root) {
+        moveTooltipRootOutsideThread(root);
+      });
+    });
+  }
+
+  function stopTooltipObserver(list) {
+    if (!list._commentThreadTooltipObserver) return;
+    list._commentThreadTooltipObserver.disconnect();
+    delete list._commentThreadTooltipObserver;
+  }
+
+  function observeNestedTooltips(list) {
+    stopTooltipObserver(list);
+    moveNestedTooltipRoots([list]);
+
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        moveNestedTooltipRoots(Array.prototype.slice.call(mutation.addedNodes));
+      });
+    });
+    observer.observe(list, { childList: true, subtree: true });
+    list._commentThreadTooltipObserver = observer;
+  }
+
   function collectThreadItems(container) {
     // 收合功能讀取階層重組後的結果：原始留言保留 id，多樓標記的複製留言則以 data attribute 識別。
     return Array.prototype.slice.call(container.querySelectorAll(tools.selectors.item + ', ' + THREAD_COPY_SELECTOR));
@@ -261,6 +299,7 @@
   }
 
   function flatten(list, preserveCollapseState) {
+    stopTooltipObserver(list);
     removeCollapseControls(list, !preserveCollapseState);
     var editor = list.querySelector(':scope > .c-reply__editor');
     Array.prototype.slice.call(list.querySelectorAll('[data-comment-thread-copy="true"]')).forEach(function (copy) {
@@ -375,6 +414,7 @@
       });
     });
     applyCollapseControls(list, collapseEnabled);
+    observeNestedTooltips(list);
   }
 
   tools.features = tools.features || {};

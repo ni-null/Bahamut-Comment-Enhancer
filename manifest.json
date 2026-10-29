@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "巴哈留言優化工具",
-  "version": "2.0",
+  "version": "2.1",
   "description": "僅在巴哈姆特論壇 C.php 與 Co.php 頁面提供留言階層、排序與顯示優化。",
   "icons": {
     "16": "icons/icon16.png",
@@ -50,7 +50,6 @@
         "content/features/comment-styles/default.js",
         "content/features/comment-styles/block.js",
         "content/features/comment-styles/gnn.js",
-        "content/ui/info-modal.js",
         "content/ui/control-menu.js",
         "content/services/settings.js",
         "content/main.js"

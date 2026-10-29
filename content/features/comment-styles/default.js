@@ -1,6 +1,6 @@
 /**
  * 功能簡介：預設留言主題及其預設功能組合。
- * 此檔是預設主題的唯一設定來源；首次使用、切回預設主題與還原預設都會套用 defaultSettings。
+ * 此檔是預設主題的唯一設定來源；首次使用或切回預設主題時會套用 defaultSettings。
  */
 (function (window, document) {
   'use strict';

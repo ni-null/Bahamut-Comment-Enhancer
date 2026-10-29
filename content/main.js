@@ -93,14 +93,6 @@
     if (!relativeTimeTimer) relativeTimeTimer = window.setInterval(refreshRelativeTimes, 60000);
   }
 
-  function resetSettings() {
-    state = storage.normalize(Object.assign({}, storage.defaults, commentStyles.getDefaultSettings('default')));
-    applySettingsToMountedLists();
-    syncRelativeTimeTimer();
-    syncControls();
-    storage.save(state);
-  }
-
   function isNewCommentNode(node) {
     return node.nodeType === 1 &&
       (node.matches(tools.selectors.item) || node.querySelector(tools.selectors.item));
@@ -221,7 +213,6 @@
         getState: function () { return state; },
         getDisabledSettings: function () { return commentStyles.getDisabledSettings(state.commentStyle); },
         onSettingChange: setSetting,
-        onReset: resetSettings,
         validation: validation
       });
     } catch (error) {

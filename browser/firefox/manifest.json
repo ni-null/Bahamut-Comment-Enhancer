@@ -58,6 +58,7 @@
         "content/features/comment-styles.js",
         "content/features/comment-styles/default.js",
         "content/features/comment-styles/block.js",
+        "content/features/comment-styles/gnn.js",
         "content/ui/info-modal.js",
         "content/ui/control-menu.js",
         "content/services/settings.js",

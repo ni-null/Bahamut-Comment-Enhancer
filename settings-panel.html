@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>留言設定面板</title>
+<style>
+  /* ========== 設計變數（維持原配色：青藍主色） ========== */
+  :root {
+    --primary: #167f98;
+    --primary-dark: #0f6579;
+    --primary-soft: #eaf4f8;
+    --primary-border: #b7d8e4;
+    --bg: #ffffff;
+    --card: #f7f8f9;
+    --card-border: #e1e4e8;
+    --text: #222;
+    --text-sub: #6b7280;
+    --off: #c4c7cc;
+    --radius: 12px;
+    --font: -apple-system, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9edf0; font-family: var(--font); color: var(--text); }
+
+  /* ========== 面板 ========== */
+  .panel {
+    width: 100%; max-width: 440px; margin: 24px auto;
+    background: var(--bg); border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.14);
+    overflow: hidden; font-size: 15px;
+  }
+
+  /* 主題區（置頂、固定） */
+  .theme-bar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 18px;
+    background: var(--primary-soft);
+    border-bottom: 1px solid var(--primary-border);
+  }
+  .theme-bar .label { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: var(--primary); }
+  .theme-bar .label svg { width: 20px; height: 20px; }
+
+  .body { padding: 14px; display: flex; flex-direction: column; gap: 12px; max-height: 70vh; overflow-y: auto; }
+
+  /* ========== 群組卡片 ========== */
+  .group { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 12px 14px 6px; }
+  .group h3 {
+    margin: 0 0 6px; font-size: 13px; letter-spacing: .08em; color: var(--primary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .group h3::after { content: ""; flex: 1; height: 1px; background: var(--card-border); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
+  .row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    min-height: 46px; padding: 6px 0;
+  }
+  .row.full { grid-column: 1 / -1; }
+  .row > span { line-height: 1.3; }
+  .row .ctrl { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* 依主題顯示 / 隱藏 */
+  [data-themes] { display: none !important; }
+  body[data-theme="block"]  [data-themes~="block"],
+  body[data-theme="flat"]   [data-themes~="flat"],
+  body[data-theme="bubble"] [data-themes~="bubble"] { display: flex !important; }
+  .group[data-themes] { display: none !important; }
+  body[data-theme="block"]  .group[data-themes~="block"],
+  body[data-theme="flat"]   .group[data-themes~="flat"],
+  body[data-theme="bubble"] .group[data-themes~="bubble"] { display: block !important; }
+
+  /* ========== 開關 ========== */
+  .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+  .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 2; }
+  .switch .track { position: absolute; inset: 0; background: var(--off); border-radius: 999px; transition: background .2s; }
+  .switch .track::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;
+    background: #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .2s;
+  }
+  .switch input:checked + .track { background: var(--primary); }
+  .switch input:checked + .track::after { transform: translateX(20px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+  /* ========== 下拉選單 ========== */
+  select {
+    appearance: none; -webkit-appearance: none;
+    font: inherit; font-size: 14px; color: var(--text);
+    padding: 7px 30px 7px 12px; border: 1px solid #cfd4da; border-radius: 8px; background: #fff
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+      no-repeat right 10px center;
+    cursor: pointer; transition: border-color .15s, box-shadow .15s;
+  }
+  select:hover { border-color: var(--primary); }
+  select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,127,152,.18); }
+  .theme-bar select { font-weight: 600; border-color: var(--primary-border); min-width: 120px; }
+
+  /* ========== 圖示按鈕 ========== */
+  .icon-btn {
+    width: 32px; height: 32px; display: grid; place-items: center; padding: 0;
+    border: 1px solid transparent; border-radius: 8px; background: transparent; color: #444; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .icon-btn:hover { background: var(--primary-soft); color: var(--primary); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* ========== 底部 ========== */
+  .footer { display: flex; gap: 10px; padding: 12px 14px 14px; border-top: 1px solid var(--card-border); background: #fff; }
+  .btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 14px; font: inherit; font-weight: 600; cursor: pointer;
+    background: #fff; color: var(--text); border: 1px solid #cfd4da; border-radius: 10px;
+    transition: all .15s;
+  }
+  .btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+  .btn.square { flex: 0 0 44px; padding: 10px; }
+  .btn svg { width: 18px; height: 18px; }
+  .btn:active svg.spin { transform: rotate(-180deg); transition: transform .3s; }
+
+  @media (max-width: 480px) {
+    .panel { margin: 0; border-radius: 0; max-width: none; }
+    .grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1d2125; --card:#262b30; --card-border:#383e45; --text:#e8eaed; --primary:#3fb2cc; --primary-soft:#1f3a44; --primary-border:#2f5967; --off:#555b63; }
+    body { background:#111; }
+    select { background-color:#1d2125; color:var(--text); border-color:#444b53; }
+    .btn { background:var(--bg); color:var(--text); border-color:#444b53; }
+    .footer { background: var(--bg); }
+    .icon-btn { color: var(--text); }
+  }
+</style>
+</head>
+<body data-theme="block">
+
+<!-- SVG 圖示庫 -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M12 11v6M12 7.5v.01" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.5-2-.6-1.2.2-2.5 1.6-2.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="11" cy="7.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/></symbol>
+</svg>
+
+<div class="panel" id="panel">
+
+  <!-- ① 主題（置頂；其餘功能依此顯示） -->
+  <div class="theme-bar">
+    <div class="label"><svg><use href="#i-palette"/></svg>主題</div>
+    <select id="theme" aria-label="主題">
+      <option value="block">區塊化</option>
+      <option value="flat">扁平</option>
+      <option value="bubble">氣泡</option>
+    </select>
+  </div>
+
+  <div class="body">
+
+    <!-- ② 留言 -->
+    <section class="group">
+      <h3>留言</h3>
+      <div class="grid">
+        <label class="row">
+          <span>階層留言</span>
+          <span class="ctrl">
+            <label class="switch"><input type="checkbox" data-key="nested" checked><span class="track"></span></label>
+            <button class="icon-btn" type="button" title="階層進階設定" data-open="nested"><svg><use href="#i-sliders"/></svg></button>
+          </span>
+        </label>
+        <label class="row">
+          <span>自動展開所有留言</span>
+          <span class="switch"><input type="checkbox" data-key="autoExpand" checked><span class="track"></span></span>
+        </label>
+        <label class="row">
+          <span>排序方式</span>
+          <select data-key="sort">
+            <option value="raw">原始</option>
+            <option value="new">最新</option>
+            <option value="hot">最熱</option>
+          </select>
+        </label>
+        <label class="row">
+          <span>回覆框跟隨留言</span>
+          <span class="switch"><input type="checkbox" data-key="replyFollow" checked><span class="track"></span></span>
+        </label>
+        <label class="row">
+          <span>標記優化</span>
+          <span class="switch"><input type="checkbox" data-key="tagOpt" checked><span class="track"></span></span>
+        </label>
+        <!-- 範例：只在特定主題顯示的功能（data-themes 用空白分隔） -->
+        <label class="row" data-themes="bubble">
+          <span>氣泡圓角</span>
+          <span class="switch"><input type="checkbox" data-key="bubbleRound" checked><span class="track"></span></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ③ 顯示 -->
+    <section class="group">
+      <h3>顯示</h3>
+      <div class="grid">
+        <div class="row">
+          <span>頭像樣式</span>
+          <button class="icon-btn" type="button" title="頭像設定" data-open="avatar"><svg><use href="#i-sliders"/></svg></button>
+        </div>
+        <label class="row">
+          <span>時間顯示</span>
+          <select data-key="timeMode">
+            <option value="rel">相對時間</option>
+            <option value="abs">絕對時間</option>
+          </select>
+        </label>
+        <label class="row">
+          <span>隱藏 HOT 標籤</span>
+          <span class="switch"><input type="checkbox" data-key="hideHot" checked><span class="track"></span></span>
+        </label>
+        <label class="row">
+          <span>留言區高度</span>
+          <select data-key="height">
+            <option value="none">不限制</option>
+            <option value="400">400px</option>
+            <option value="600">600px</option>
+          </select>
+        </label>
+        <!-- 範例：僅區塊化 / 扁平顯示 -->
+        <label class="row" data-themes="block flat">
+          <span>顯示分隔線</span>
+          <span class="switch"><input type="checkbox" data-key="divider"><span class="track"></span></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ④ 媒體 -->
+    <section class="group">
+      <h3>媒體</h3>
+      <div class="grid">
+        <label class="row">
+          <span>縮小預覽</span>
+          <span class="switch"><input type="checkbox" data-key="miniPreview"><span class="track"></span></span>
+        </label>
+        <label class="row">
+          <span>自訂圖片燈箱</span>
+          <span class="switch"><input type="checkbox" data-key="lightbox" checked><span class="track"></span></span>
+        </label>
+        <label class="row">
+          <span>YouTube 燈箱播放</span>
+          <span class="switch"><input type="checkbox" data-key="ytLightbox" checked><span class="track"></span></span>
+        </label>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ⑤ 底部操作 -->
+  <div class="footer">
+    <button class="btn" type="button" id="reset"><svg class="spin"><use href="#i-reset"/></svg>還原預設</button>
+    <button class="btn square" type="button" id="about" title="關於"><svg><use href="#i-info"/></svg></button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'comment-settings-v1';
+  var panel = document.getElementById('panel');
+  var themeSel = document.getElementById('theme');
+  var fields = panel.querySelectorAll('[data-key]');
+  var defaults = {};
+
+  // 記錄預設值
+  fields.forEach(function (el) {
+    defaults[el.dataset.key] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  defaults.theme = themeSel.value;
+
+  function read() {
+    var s = { theme: themeSel.value };
+    fields.forEach(function (el) { s[el.dataset.key] = el.type === 'checkbox' ? el.checked : el.value; });
+    return s;
+  }
+  function apply(s) {
+    themeSel.value = s.theme;
+    document.body.dataset.theme = s.theme;
+    fields.forEach(function (el) {
+      var v = s[el.dataset.key];
+      if (v === undefined) return;
+      if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+    });
+  }
+  function save() {
+    var s = read();
+    document.body.dataset.theme = s.theme;
+    try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
+    // 對外通知：在你的腳本中監聽 'settingschange' 即可
+    document.dispatchEvent(new CustomEvent('settingschange', { detail: s }));
+  }
+
+  // 載入
+  try { var saved = JSON.parse(localStorage.getItem(KEY)); if (saved) apply(Object.assign({}, defaults, saved)); } catch (e) {}
+  document.body.dataset.theme = themeSel.value;
+
+  themeSel.addEventListener('change', save);
+  fields.forEach(function (el) { el.addEventListener('change', save); });
+
+  document.getElementById('reset').addEventListener('click', function () { apply(defaults); save(); });
+  document.getElementById('about').addEventListener('click', function () { alert('留言設定面板 v1.0'); });
+  panel.querySelectorAll('[data-open]').forEach(function (b) {
+    b.addEventListener('click', function () { document.dispatchEvent(new CustomEvent('settingsopen', { detail: b.dataset.open })); });
+  });
+})();
+</script>
+</body>
+</html>

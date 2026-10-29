@@ -20,10 +20,10 @@
       '.comment-thread-controls-host { position: relative; }',
       '.comment-thread-controls-host > .' + CONTROL_BAR_CLASS + ',',
       '.comment-thread-controls-host > .c-reply__head > .' + CONTROL_BAR_CLASS + ' {',
-      '  position: absolute; z-index: 11; top: 8px; right: 8px; display: inline-flex;',
+      '  position: static; display: inline-flex;',
       '}',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ' {',
-      '  border: 0; padding: 0; background: none; color: inherit;',
+      '  position: absolute; z-index: 11; top: 8px; right: 8px; border: 0; padding: 0; background: none; color: inherit;',
       '  cursor: pointer; line-height: 1; opacity: .55;',
       '}',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ':hover,',
@@ -31,7 +31,7 @@
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + '[aria-expanded="true"] { opacity: 1; }',
       '.' + CONTROL_BAR_CLASS + ' > button.' + CONTROL_CLASS + ' > .material-icons { display: block; font-size: 18px; padding: 0; }',
       '.' + CONTROL_MENU_CLASS + ' {',
-      '  position: absolute; z-index: 10; top: calc(100% + 4px); right: 0;',
+      '  position: absolute; z-index: 12; top: 34px; right: 8px;',
       '  width: min(412px, calc(100vw - 24px)); padding: 10px; border: 1px solid rgba(127,127,127,.45);',
       '  border-radius: 4px; background: Canvas; color: CanvasText;',
       '  box-shadow: 0 2px 8px rgba(0,0,0,.18);',
@@ -73,11 +73,9 @@
       '}',
       '.' + CONTROL_MENU_CLASS + '__threading-settings-button > .material-icons { font-size: 18px; }',
       '.' + CONTROL_MENU_CLASS + '__threading-settings {',
-      '  position: absolute; z-index: 2; top: calc(100% + 5px); left: 0; min-width: 218px;',
-      '  padding: 6px; border: 1px solid rgba(127,127,127,.45); border-radius: 4px;',
-      '  background: Canvas; color: CanvasText; box-shadow: 0 2px 8px rgba(0,0,0,.18);',
+      '  position: absolute; z-index: 20; inset: 0; padding: 0; overflow-y: auto; background: #fff; color: #222;',
       '}',
-      '.' + CONTROL_MENU_CLASS + '__threading-settings > .' + CONTROL_MENU_CLASS + '__item { font-size: .92em; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-settings[hidden] { display: none; }',
       '.' + CONTROL_MENU_CLASS + '__avatar-control { position: relative; display: flex; align-items: center; min-width: 0; }',
       '.' + CONTROL_MENU_CLASS + '__avatar-control-title { flex: 1 1 auto; cursor: default; }',
       '.' + CONTROL_MENU_CLASS + '__avatar-settings-button {',
@@ -91,11 +89,41 @@
       '}',
       '.' + CONTROL_MENU_CLASS + '__avatar-settings-button > .material-icons { font-size: 18px; }',
       '.' + CONTROL_MENU_CLASS + '__avatar-settings {',
-      '  position: absolute; z-index: 2; top: calc(100% + 5px); left: 0; min-width: 218px;',
-      '  padding: 6px; border: 1px solid rgba(127,127,127,.45); border-radius: 4px;',
-      '  background: Canvas; color: CanvasText; box-shadow: 0 2px 8px rgba(0,0,0,.18);',
+      '  position: absolute; z-index: 20; inset: 0; padding: 0; overflow-y: auto; background: #fff; color: #222;',
       '}',
-      '.' + CONTROL_MENU_CLASS + '__avatar-settings > .' + CONTROL_MENU_CLASS + '__item { font-size: .92em; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-settings[hidden] { display: none; }',
+      '.' + CONTROL_MENU_CLASS + '.avatar-sheet-open > .' + CONTROL_MENU_CLASS + '__theme,',
+      '.' + CONTROL_MENU_CLASS + '.avatar-sheet-open > .' + CONTROL_MENU_CLASS + '__tab-row,',
+      '.' + CONTROL_MENU_CLASS + '.avatar-sheet-open > .' + CONTROL_MENU_CLASS + '__layout,',
+      '.' + CONTROL_MENU_CLASS + '.avatar-sheet-open > .' + CONTROL_MENU_CLASS + '__actions { display: none; }',
+      '.' + CONTROL_MENU_CLASS + '.avatar-sheet-open > .' + CONTROL_MENU_CLASS + '__avatar-settings { position: relative; inset: auto; min-height: 360px; }',
+      '.' + CONTROL_MENU_CLASS + '.threading-sheet-open > .' + CONTROL_MENU_CLASS + '__theme,',
+      '.' + CONTROL_MENU_CLASS + '.threading-sheet-open > .' + CONTROL_MENU_CLASS + '__tab-row,',
+      '.' + CONTROL_MENU_CLASS + '.threading-sheet-open > .' + CONTROL_MENU_CLASS + '__layout,',
+      '.' + CONTROL_MENU_CLASS + '.threading-sheet-open > .' + CONTROL_MENU_CLASS + '__actions { display: none; }',
+      '.' + CONTROL_MENU_CLASS + '.threading-sheet-open > .' + CONTROL_MENU_CLASS + '__threading-settings { position: relative; inset: auto; min-height: 280px; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-sheet-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #eaf4f8; border-bottom: 1px solid #b7d8e4; color: #167f98; font-size: 16px; font-weight: 700; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-sheet-body { display: flex; flex-direction: column; gap: 6px; padding: 14px; }',
+      '.' + CONTROL_MENU_CLASS + '__threading-sheet-back { margin: 12px 14px 14px; width: calc(100% - 28px); min-height: 40px; border: 1px solid #cfd4da; border-radius: 10px; background: #fff; color: #222; cursor: pointer; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sheet-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #eaf4f8; border-bottom: 1px solid #b7d8e4; color: #167f98; font-size: 16px; font-weight: 700; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sheet-body { display: flex; flex-direction: column; gap: 14px; padding: 14px; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-options-title { margin: 0 0 8px; color: #6b7280; font-size: 13px; font-weight: 700; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-option { position: relative; display: flex; min-height: 90px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 8px 4px; border: 1px solid #e1e4e8; border-radius: 10px; background: #fff; color: #6b7280; cursor: pointer; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-option:hover { border-color: #b7d8e4; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-option.is-active { border: 2px solid #167f98; background: #eaf4f8; color: #167f98; font-weight: 600; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sample { width: 34px; height: 34px; background: linear-gradient(135deg, #5bb5cb, #167f98); }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sample.is-small { width: 20px; height: 20px; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sample.is-hidden { position: relative; background: transparent; border: 2px dashed #9aa3ab; border-radius: 50%; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sample.is-hidden::after { position: absolute; content: ""; width: 24px; height: 2px; top: 7px; left: -4px; transform: rotate(-45deg); background: #9aa3ab; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sample.is-round { border-radius: 50%; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sample.is-square { border-radius: 0; }',
+      '.' + CONTROL_MENU_CLASS + '__avatar-sheet-back { margin: 12px 14px 14px; width: calc(100% - 28px); min-height: 40px; border: 1px solid #cfd4da; border-radius: 10px; background: #fff; color: #222; cursor: pointer; }',
+      '.' + CONTROL_MENU_CLASS + '__shape-preview { display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; }',
+      '.' + CONTROL_MENU_CLASS + '__shape-swatch { width: 16px; height: 16px; border: 2px solid #9aa5ad; background: #dce8ec; }',
+      '.' + CONTROL_MENU_CLASS + '__shape-swatch[data-shape="round"] { border-radius: 50%; }',
+      '.' + CONTROL_MENU_CLASS + '__shape-swatch[data-shape="square"] { border-radius: 3px; }',
+      '.' + CONTROL_MENU_CLASS + '__shape-swatch.is-active { border-color: #167f98; background: #b7d8e4; box-shadow: 0 0 0 2px rgba(22,127,152,.16); }',
       '@media (max-width: 480px) {',
       '  .' + CONTROL_MENU_CLASS + '__layout { grid-template-columns: minmax(0, 1fr); }',
       '  .' + CONTROL_MENU_CLASS + '__group { grid-template-columns: minmax(0, 1fr); }',
@@ -153,11 +181,66 @@
       '  border-color: #117e96; background: rgba(17,126,150,.1); color: #117e96;',
       '  outline: none;',
       '}',
+      '.' + CONTROL_MENU_CLASS + '__rating-star { color: #f5b82e; font-size: 21px; line-height: 1; text-shadow: 0 1px 0 rgba(166,104,0,.28); }',
       '.' + CONTROL_MENU_CLASS + '__info:hover,',
       '.' + CONTROL_MENU_CLASS + '__info:focus-visible,',
       '.' + CONTROL_MENU_CLASS + '__info[aria-expanded="true"] {',
       '  border-color: #117e96; background: rgba(17,126,150,.1); color: #117e96;',
       '  outline: none;',
+      '}',
+      /* settings-panel.html 視覺：把現有動態控制項放入白色設定卡片。 */
+      '.' + CONTROL_MENU_CLASS + ' { width: min(520px, calc(100vw - 24px)); max-height: none; padding: 0; overflow: visible; border: 0; border-radius: 16px; background: #fff; color: #222; box-shadow: 0 8px 30px rgba(0,0,0,.2); font: 15px -apple-system, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }',
+      '.' + CONTROL_MENU_CLASS + '__theme { position: sticky; top: 0; z-index: 5; min-height: 56px; margin: 0; padding: 10px 16px; border: 0; border-bottom: 1px solid #b7d8e4; border-radius: 16px 16px 0 0; background: #eaf4f8; color: #167f98; font-size: 17px; }',
+      '.' + CONTROL_MENU_CLASS + '__theme-label { display: flex; align-items: center; gap: 8px; font-weight: 700; }',
+      '.' + CONTROL_MENU_CLASS + '__theme-icon { font-size: 20px; }',
+      '.' + CONTROL_MENU_CLASS + '__about { grid-column: 1 / -1; width: 100%; max-height: 65vh; overflow-y: auto; padding: 18px; }',
+      '.' + CONTROL_MENU_CLASS + '__about h2 { margin: 0 36px 8px 0; color: #167f98; font-size: 1.1em; }',
+      '.' + CONTROL_MENU_CLASS + '__about h3 { margin: 12px 0 4px; color: #167f98; font-size: .95em; }',
+      '.' + CONTROL_MENU_CLASS + '__about p { margin: 0; font-size: .92em; line-height: 1.6; overflow-wrap: anywhere; }',
+      '.' + CONTROL_MENU_CLASS + '__about p + p { margin-top: 5px; }',
+      '.' + CONTROL_MENU_CLASS + '__about a { color: #167f98; }',
+      '.' + CONTROL_MENU_CLASS + '__theme > .' + CONTROL_MENU_CLASS + '__select { min-width: 120px; padding: 7px 30px 7px 12px; border: 1px solid #b7d8e4; border-radius: 8px; background-color: #fff; color: #222; font-size: 14px; }',
+      '.' + CONTROL_MENU_CLASS + '__layout { display: flex; flex-direction: column; gap: 10px; padding: 12px; }',
+      '.' + CONTROL_MENU_CLASS + '__tab-row { display: flex; align-items: stretch; gap: 8px; margin: 12px 14px 0; }',
+      '.' + CONTROL_MENU_CLASS + '__tabs { display: flex; flex: 1 1 auto; gap: 4px; margin: 0; padding: 4px; border-radius: 10px; background: #eceff2; }',
+      '.' + CONTROL_MENU_CLASS + '__about-button { display: inline-flex; flex: 0 0 42px; align-items: center; justify-content: center; border: 1px solid #cfd4da; border-radius: 10px; background: #fff; color: #6b7280; cursor: pointer; }',
+      '.' + CONTROL_MENU_CLASS + '__about-button:hover, .' + CONTROL_MENU_CLASS + '__about-button:focus-visible { border-color: #167f98; background: #eaf4f8; color: #167f98; outline: none; }',
+      '.' + CONTROL_MENU_CLASS + '__about-button[aria-pressed="true"] { border-color: #167f98; background: #eaf4f8; color: #167f98; }',
+      '.' + CONTROL_MENU_CLASS + '__tab { display: flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 6px; min-width: 0; padding: 8px 6px; border: 0; border-radius: 7px; background: transparent; color: #6b7280; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s, color .15s, box-shadow .15s; }',
+      '.' + CONTROL_MENU_CLASS + '__tab:hover { color: #167f98; }',
+      '.' + CONTROL_MENU_CLASS + '__tab[aria-selected="true"] { background: #fff; color: #167f98; box-shadow: 0 1px 3px rgba(0,0,0,.15); }',
+      '.' + CONTROL_MENU_CLASS + '__tab-panel { display: none; }',
+      '.' + CONTROL_MENU_CLASS + '__tab-panel.is-active { display: block; animation: comment-thread-tab-fade .18s ease; }',
+      '@keyframes comment-thread-tab-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }',
+      '.' + CONTROL_MENU_CLASS + '__group { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 16px; padding: 10px 12px 6px; border: 1px solid #e1e4e8; border-radius: 12px; background: #f7f8f9; }',
+      '.' + CONTROL_MENU_CLASS + '__group-title { position: relative; padding: 0 0 6px; color: #167f98; font-size: 13px; letter-spacing: .08em; }',
+      '.' + CONTROL_MENU_CLASS + '__group-title::after { position: absolute; right: 0; bottom: 12px; left: 46px; height: 1px; background: #e1e4e8; content: ""; }',
+      '.' + CONTROL_MENU_CLASS + '__item { min-width: 0; min-height: 40px; gap: 6px; padding: 2px 0; color: #222; white-space: normal; font-size: 14px; }',
+      '.' + CONTROL_MENU_CLASS + '__switch-track { width: 46px; height: 26px; border: 0; background: #c4c7cc; }',
+      '.' + CONTROL_MENU_CLASS + '__switch-track::after { top: 3px; left: 3px; width: 20px; height: 20px; }',
+      '.' + CONTROL_MENU_CLASS + '__switch:checked + .' + CONTROL_MENU_CLASS + '__switch-track { border-color: #167f98; background: #167f98; }',
+      '.' + CONTROL_MENU_CLASS + '__switch:checked + .' + CONTROL_MENU_CLASS + '__switch-track::after { transform: translateX(20px); }',
+      '.' + CONTROL_MENU_CLASS + '__select, .' + CONTROL_MENU_CLASS + '__number { min-width: 0; max-width: 125px; padding: 6px 24px 6px 8px; border: 1px solid #cfd4da; border-radius: 8px; background-color: #fff; color: #222; font-size: 12px; }',
+      '.' + CONTROL_MENU_CLASS + '__actions { margin: 0; padding: 12px 14px 14px; border-top: 1px solid #e1e4e8; background: #fff; }',
+      '.' + CONTROL_MENU_CLASS + '__reset, .' + CONTROL_MENU_CLASS + '__info { min-height: 42px; border: 1px solid #cfd4da; border-radius: 10px; background: #fff; }',
+      '.' + CONTROL_MENU_CLASS + '__info { flex-basis: 44px; }',
+      '@media (prefers-color-scheme: dark) {',
+      '  .' + CONTROL_MENU_CLASS + ' { background: #1d2125; color: #e8eaed; }',
+      '  .' + CONTROL_MENU_CLASS + '__theme { background: #1f3a44; border-color: #2f5967; color: #3fb2cc; }',
+      '  .' + CONTROL_MENU_CLASS + '__group { background: #262b30; border-color: #383e45; }',
+      '  .' + CONTROL_MENU_CLASS + '__tabs { background: #14171a; }',
+      '  .' + CONTROL_MENU_CLASS + '__tab[aria-selected="true"] { background: #262b30; }',
+      '  .' + CONTROL_MENU_CLASS + '__group-title { color: #3fb2cc; }',
+      '  .' + CONTROL_MENU_CLASS + '__group-title::after { background: #383e45; }',
+      '  .' + CONTROL_MENU_CLASS + '__item { color: #e8eaed; }',
+      '  .' + CONTROL_MENU_CLASS + '__select, .' + CONTROL_MENU_CLASS + '__number { background-color: #1d2125; color: #e8eaed; border-color: #444b53; }',
+      '  .' + CONTROL_MENU_CLASS + '__actions { background: #1d2125; }',
+      '  .' + CONTROL_MENU_CLASS + '__reset, .' + CONTROL_MENU_CLASS + '__info { background: #1d2125; color: #e8eaed; border-color: #444b53; }',
+      '}',
+      '@media (max-width: 600px) {',
+      '  .' + CONTROL_MENU_CLASS + ' { width: min(440px, calc(100vw - 16px)); }',
+      '  .' + CONTROL_MENU_CLASS + '__group { grid-template-columns: minmax(0, 1fr); }',
+      '  .' + CONTROL_MENU_CLASS + '__item { min-height: 38px; }',
       '}'
     ].join('\n');
     document.head.appendChild(style);
@@ -205,28 +288,68 @@
 
     var settings = document.createElement('div');
     settings.className = CONTROL_MENU_CLASS + '__threading-settings';
+    settings._commentThreadThreadingControl = control;
+    settings._commentThreadThreadingButton = settingsButton;
     settings.hidden = true;
-    settings.appendChild(createMenuToggle('階層時遮蔽樓層', 'hideReplyAnnotation', state, onSettingChange, {
+    var sheetHead = document.createElement('div');
+    sheetHead.className = CONTROL_MENU_CLASS + '__threading-sheet-head';
+    var backButton = document.createElement('button');
+    backButton.type = 'button';
+    backButton.className = CONTROL_MENU_CLASS + '__threading-settings-button';
+    backButton.setAttribute('aria-label', '返回設定');
+    backButton.appendChild(createMaterialIcon('arrow_back'));
+    sheetHead.appendChild(backButton);
+    sheetHead.appendChild(document.createTextNode('階層留言設定'));
+    settings.appendChild(sheetHead);
+    var sheetBody = document.createElement('div');
+    sheetBody.className = CONTROL_MENU_CLASS + '__threading-sheet-body';
+    sheetBody.appendChild(createMenuToggle('階層時遮蔽樓層', 'hideReplyAnnotation', state, onSettingChange, {
       disabled: !state.threadingEnabled
     }));
-    settings.appendChild(createMenuToggle('顯示階層分隔線', 'showThreadSeparators', state, onSettingChange, {
+    sheetBody.appendChild(createMenuToggle('顯示階層分隔線', 'showThreadSeparators', state, onSettingChange, {
       disabled: !state.threadingEnabled
     }));
-    settings.appendChild(createMenuToggle('收合階層', 'collapseThreadingEnabled', state, onSettingChange, {
+    sheetBody.appendChild(createMenuToggle('收合階層', 'collapseThreadingEnabled', state, onSettingChange, {
       disabled: !state.threadingEnabled
     }));
+    settings.appendChild(sheetBody);
+    var returnButton = document.createElement('button');
+    returnButton.type = 'button';
+    returnButton.className = CONTROL_MENU_CLASS + '__threading-sheet-back';
+    returnButton.textContent = '返回設定';
+    settings.appendChild(returnButton);
+    function closeSheet() {
+      restoreThreadingSheet(settings);
+      settingsButton.focus();
+    }
+    backButton.addEventListener('click', closeSheet);
+    returnButton.addEventListener('click', closeSheet);
 
     settingsButton.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
       var shouldOpen = settings.hidden;
       closeSettingsPanels(control.closest('.' + CONTROL_MENU_CLASS), shouldOpen ? settings : null);
+      if (shouldOpen) control.closest('.' + CONTROL_MENU_CLASS).appendChild(settings);
       settings.hidden = !shouldOpen;
+      control.closest('.' + CONTROL_MENU_CLASS).classList.toggle('threading-sheet-open', shouldOpen);
       settingsButton.setAttribute('aria-expanded', String(shouldOpen));
     });
     control.appendChild(settingsButton);
     control.appendChild(settings);
     return control;
+  }
+
+  function restoreThreadingSheet(settings) {
+    if (!settings || !settings._commentThreadThreadingControl) return;
+    var control = settings._commentThreadThreadingControl;
+    var menu = control.closest('.' + CONTROL_MENU_CLASS);
+    control.appendChild(settings);
+    settings.hidden = true;
+    if (menu) menu.classList.remove('threading-sheet-open');
+    if (settings._commentThreadThreadingButton) {
+      settings._commentThreadThreadingButton.setAttribute('aria-expanded', 'false');
+    }
   }
 
   function createAvatarControl(state, onSettingChange) {
@@ -248,29 +371,107 @@
 
     var settings = document.createElement('div');
     settings.className = CONTROL_MENU_CLASS + '__avatar-settings';
+    settings._commentThreadAvatarControl = control;
+    settings._commentThreadAvatarButton = settingsButton;
     settings.hidden = true;
-    settings.appendChild(createMenuSelect('頭像大小', 'avatarDisplay', [
-      { value: 'default', label: '預設' },
-      { value: 'small', label: '縮小' },
-      { value: 'none', label: '隱藏' }
-    ], state, onSettingChange));
-    settings.appendChild(createMenuSelect('頭像形狀', 'avatarShape', [
-      { value: 'round', label: '圓形' },
-      { value: 'square', label: '方形' }
-    ], state, onSettingChange));
-    settings.appendChild(createMenuToggle('停懸顯示樓層', 'floorAtAvatarEnabled', state, onSettingChange));
+    var sheetHead = document.createElement('div');
+    sheetHead.className = CONTROL_MENU_CLASS + '__avatar-sheet-head';
+    var backButton = document.createElement('button');
+    backButton.type = 'button';
+    backButton.className = CONTROL_MENU_CLASS + '__avatar-settings-button';
+    backButton.setAttribute('aria-label', '返回設定');
+    backButton.appendChild(createMaterialIcon('arrow_back'));
+    sheetHead.appendChild(backButton);
+    sheetHead.appendChild(document.createTextNode('頭像樣式'));
+    settings.appendChild(sheetHead);
+    var body = document.createElement('div');
+    body.className = CONTROL_MENU_CLASS + '__avatar-sheet-body';
+    var sizeGroup = createAvatarOptionGroup('頭像大小', 'avatarDisplay', [
+      { value: 'default', label: '預設', sample: 'large' },
+      { value: 'small', label: '縮小', sample: 'small' },
+      { value: 'none', label: '隱藏', sample: 'hidden' }
+    ], state.avatarDisplay, onSettingChange);
+    var shapeGroup = createAvatarOptionGroup('頭像形狀', 'avatarShape', [
+      { value: 'round', label: '圓形', sample: 'round' },
+      { value: 'square', label: '方形', sample: 'square' }
+    ], state.avatarShape, onSettingChange);
+    body.appendChild(sizeGroup);
+    body.appendChild(shapeGroup);
+    body.appendChild(createMenuToggle('停懸顯示樓層', 'floorAtAvatarEnabled', state, onSettingChange));
+    settings.appendChild(body);
+    var returnButton = document.createElement('button');
+    returnButton.type = 'button';
+    returnButton.className = CONTROL_MENU_CLASS + '__avatar-sheet-back';
+    returnButton.textContent = '返回設定';
+    settings.appendChild(returnButton);
+    function closeSheet() {
+      restoreAvatarSheet(settings);
+      settingsButton.focus();
+    }
+    backButton.addEventListener('click', closeSheet);
+    returnButton.addEventListener('click', closeSheet);
 
     settingsButton.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
       var shouldOpen = settings.hidden;
       closeSettingsPanels(control.closest('.' + CONTROL_MENU_CLASS), shouldOpen ? settings : null);
+      if (shouldOpen) control.closest('.' + CONTROL_MENU_CLASS).appendChild(settings);
       settings.hidden = !shouldOpen;
+      control.closest('.' + CONTROL_MENU_CLASS).classList.toggle('avatar-sheet-open', shouldOpen);
       settingsButton.setAttribute('aria-expanded', String(shouldOpen));
     });
     control.appendChild(settingsButton);
     control.appendChild(settings);
     return control;
+  }
+
+  function restoreAvatarSheet(settings) {
+    if (!settings || !settings._commentThreadAvatarControl) return;
+    var control = settings._commentThreadAvatarControl;
+    var menu = control.closest('.' + CONTROL_MENU_CLASS);
+    control.appendChild(settings);
+    settings.hidden = true;
+    if (menu) menu.classList.remove('avatar-sheet-open');
+    if (settings._commentThreadAvatarButton) {
+      settings._commentThreadAvatarButton.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function createAvatarOptionGroup(titleText, settingName, options, selectedValue, onSettingChange) {
+    var group = document.createElement('section');
+    var title = document.createElement('p');
+    title.className = CONTROL_MENU_CLASS + '__avatar-options-title';
+    title.textContent = titleText;
+    group.appendChild(title);
+    var grid = document.createElement('div');
+    grid.className = CONTROL_MENU_CLASS + '__avatar-options';
+    options.forEach(function (option) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = CONTROL_MENU_CLASS + '__avatar-option';
+      button.dataset.commentThreadSetting = settingName;
+      button.dataset.commentThreadValue = option.value;
+      button.classList.toggle('is-active', option.value === selectedValue);
+      button.setAttribute('aria-pressed', String(option.value === selectedValue));
+      var sample = document.createElement('span');
+      sample.className = CONTROL_MENU_CLASS + '__avatar-sample is-' + option.sample;
+      if (settingName === 'avatarShape') sample.classList.add('is-' + option.value);
+      sample.setAttribute('aria-hidden', 'true');
+      button.appendChild(sample);
+      button.appendChild(document.createTextNode(option.label));
+      button.addEventListener('click', function () {
+        Array.prototype.forEach.call(grid.children, function (sibling) {
+          var selected = sibling === button;
+          sibling.classList.toggle('is-active', selected);
+          sibling.setAttribute('aria-pressed', String(selected));
+        });
+        onSettingChange(settingName, option.value);
+      });
+      grid.appendChild(button);
+    });
+    group.appendChild(grid);
+    return group;
   }
 
   function createMenuSelect(labelText, settingName, options, state, onSettingChange, config) {
@@ -335,7 +536,64 @@
     return icon;
   }
 
-  function createActions(onReset) {
+  function getReviewUrl() {
+    var userAgent = window.navigator && window.navigator.userAgent || '';
+    if (/Firefox\//i.test(userAgent)) {
+      return 'https://addons.mozilla.org/zh-TW/firefox/addon/%E5%B7%B4%E5%93%88%E7%95%99%E8%A8%80%E5%84%AA%E5%8C%96%E5%B7%A5%E5%85%B7/';
+    }
+    if (/Edg\//i.test(userAgent)) {
+      return 'https://microsoftedge.microsoft.com/addons/detail/%E5%B7%B4%E5%93%88%E7%95%99%E8%A8%80%E5%84%AA%E5%8C%96%E5%B7%A5%E5%85%B7/egcajbhfhbcjlomacfpildafplkcpfah';
+    }
+    return 'https://chromewebstore.google.com/detail/%E5%B7%B4%E5%93%88%E7%95%99%E8%A8%80%E5%84%AA%E5%8C%96%E5%B7%A5%E5%85%B7/nbllccpklpphcngdiboanikcpjiicckp';
+  }
+
+  function createAboutButton(onOpen) {
+    var aboutButton = document.createElement('button');
+    aboutButton.type = 'button';
+    aboutButton.className = CONTROL_MENU_CLASS + '__about-button';
+    aboutButton.setAttribute('aria-label', '查看開發者資訊與功能介紹');
+    aboutButton.setAttribute('aria-pressed', 'false');
+    aboutButton.title = '關於';
+    aboutButton.appendChild(createMaterialIcon('info'));
+    aboutButton.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      onOpen(aboutButton);
+    });
+    return aboutButton;
+  }
+
+  function createAboutPanel() {
+    var group = document.createElement('section');
+    group.className = CONTROL_MENU_CLASS + '__group';
+    var version = tools.version || (window.chrome && window.chrome.runtime && window.chrome.runtime.getManifest
+      ? window.chrome.runtime.getManifest().version
+      : '—');
+    var details = document.createElement('div');
+    details.className = CONTROL_MENU_CLASS + '__about';
+    var versionText = document.createElement('p');
+    versionText.textContent = '版本：' + version + '・瀏覽器擴充功能／Userscript';
+    var developer = document.createElement('p');
+    developer.textContent = '開發者：ninull';
+    var project = document.createElement('p');
+    project.appendChild(document.createTextNode('專案網址：'));
+    var projectLink = document.createElement('a');
+    projectLink.href = 'https://github.com/ni-null/Bahamut-Comment-Enhancer';
+    projectLink.target = '_blank';
+    projectLink.rel = 'noopener noreferrer';
+    projectLink.textContent = 'github.com/ni-null/Bahamut-Comment-Enhancer';
+    project.appendChild(projectLink);
+    var introduction = document.createElement('p');
+    introduction.textContent = '支援預設、區塊化與 GNN 主題，並提供階層留言、排序、顯示與媒體工具。功能僅在巴哈姆特 C.php、Co.php 頁面運作。';
+    details.appendChild(versionText);
+    details.appendChild(developer);
+    details.appendChild(project);
+    details.appendChild(introduction);
+    group.appendChild(details);
+    return group;
+  }
+
+  function createActions() {
     var actions = document.createElement('div');
     actions.className = CONTROL_MENU_CLASS + '__actions';
     var row = document.createElement('div');
@@ -344,30 +602,17 @@
     var resetButton = document.createElement('button');
     resetButton.type = 'button';
     resetButton.className = CONTROL_MENU_CLASS + '__reset';
-    resetButton.title = '還原所有顯示設定為預設值';
-    resetButton.appendChild(createMaterialIcon('refresh'));
-    resetButton.appendChild(document.createTextNode('還原預設'));
-    resetButton.addEventListener('click', onReset);
+    resetButton.title = '前往擴充功能商店留下評價';
+    var ratingStar = createMaterialIcon('star');
+    ratingStar.className += ' ' + CONTROL_MENU_CLASS + '__rating-star';
+    resetButton.appendChild(ratingStar);
+    resetButton.appendChild(document.createTextNode('無廣告無營利，給個好評吧'));
+    resetButton.setAttribute('type', 'button');
+    resetButton.addEventListener('click', function () {
+      window.open(getReviewUrl(), '_blank', 'noopener');
+    });
     row.appendChild(resetButton);
 
-    var infoButton = document.createElement('button');
-    infoButton.type = 'button';
-    infoButton.className = CONTROL_MENU_CLASS + '__info';
-    infoButton.setAttribute('aria-label', '查看開發者資訊與功能介紹');
-    infoButton.setAttribute('aria-expanded', 'false');
-    infoButton.title = '開發者資訊與功能介紹';
-    infoButton.appendChild(createMaterialIcon('info'));
-    infoButton.addEventListener('click', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      var infoModal = tools.ui && tools.ui.infoModal;
-      if (!infoModal || typeof infoModal.open !== 'function') {
-        window.console.warn('[巴哈留言優化工具] 開發者資訊視窗尚未載入。');
-        return;
-      }
-      infoModal.open(infoButton);
-    });
-    row.appendChild(infoButton);
     actions.appendChild(row);
     return actions;
   }
@@ -378,6 +623,14 @@
         '.' + CONTROL_MENU_CLASS + '__threading-settings, .' + CONTROL_MENU_CLASS + '__avatar-settings'
       ), function (settings) {
       if (settings === exceptSettings) return;
+      if (settings.classList.contains(CONTROL_MENU_CLASS + '__threading-settings')) {
+        restoreThreadingSheet(settings);
+        return;
+      }
+      if (settings.classList.contains(CONTROL_MENU_CLASS + '__avatar-settings')) {
+        restoreAvatarSheet(settings);
+        return;
+      }
       settings.hidden = true;
       var settingsButton = settings.previousElementSibling;
       if (settingsButton) settingsButton.setAttribute('aria-expanded', 'false');
@@ -405,7 +658,9 @@
         closeMenus();
         return;
       }
-      if (!target.closest('.' + CONTROL_MENU_CLASS + '__threading-control, .' + CONTROL_MENU_CLASS + '__avatar-control')) {
+      if (!target.closest(
+          '.' + CONTROL_MENU_CLASS + '__threading-control, .' + CONTROL_MENU_CLASS + '__threading-settings, .' + CONTROL_MENU_CLASS + '__avatar-control, .' + CONTROL_MENU_CLASS + '__avatar-settings'
+        )) {
         closeSettingsPanels(controls);
       }
     });
@@ -500,7 +755,6 @@
 
     var commentGroup = document.createElement('div');
     commentGroup.className = CONTROL_MENU_CLASS + '__group';
-    commentGroup.appendChild(createGroupTitle('留言與排序'));
     commentGroup.appendChild(createThreadingControl(state, options.onSettingChange));
     commentGroup.appendChild(createMenuToggle('自動展開所有留言', 'autoExpandCommentsEnabled', state, options.onSettingChange));
     commentGroup.appendChild(createMenuSelect('排序方式', 'commentSortMode', [
@@ -513,7 +767,6 @@
 
     var displayGroup = document.createElement('div');
     displayGroup.className = CONTROL_MENU_CLASS + '__group';
-    displayGroup.appendChild(createGroupTitle('顯示'));
     displayGroup.appendChild(createMenuToggle('用戶名至底', 'userNameAtBottomEnabled', state, options.onSettingChange));
     displayGroup.appendChild(createAvatarControl(state, options.onSettingChange));
     displayGroup.appendChild(createMenuSelect('時間顯示', 'timeDisplay', [
@@ -538,27 +791,91 @@
 
     var imageGroup = document.createElement('div');
     imageGroup.className = CONTROL_MENU_CLASS + '__group';
-    imageGroup.appendChild(createGroupTitle('圖片'));
     imageGroup.appendChild(createMenuToggle('縮小預覽', 'imageSmallPreviewEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('自訂圖片燈箱', 'imageLightboxEnabled', state, options.onSettingChange, { secondary: true }));
     imageGroup.appendChild(createMenuToggle('YouTube 燈箱播放', 'youtubeLightboxEnabled', state, options.onSettingChange, { secondary: true }));
+    var aboutGroup = createAboutPanel();
 
     var layout = document.createElement('div');
     layout.className = CONTROL_MENU_CLASS + '__layout';
-    layout.appendChild(commentGroup);
-    layout.appendChild(displayGroup);
-    layout.appendChild(imageGroup);
-    var themeControl = createMenuSelect(
-      '主題',
+    var tabs = document.createElement('div');
+    tabs.className = CONTROL_MENU_CLASS + '__tabs';
+    tabs.setAttribute('role', 'tablist');
+    var tabDefinitions = [
+      { id: 'comment', label: '留言', icon: 'forum', group: commentGroup },
+      { id: 'display', label: '顯示', icon: 'visibility', group: displayGroup },
+      { id: 'media', label: '媒體', icon: 'image', group: imageGroup }
+    ];
+    var tabPanels = [];
+    var aboutPanel = document.createElement('div');
+    aboutPanel.className = CONTROL_MENU_CLASS + '__tab-panel';
+    aboutPanel.setAttribute('role', 'tabpanel');
+    aboutPanel.appendChild(aboutGroup);
+    var aboutButton;
+    function showSettingsPanel(index) {
+      Array.prototype.forEach.call(tabs.children, function (sibling, siblingIndex) {
+        sibling.setAttribute('aria-selected', String(siblingIndex === index));
+      });
+      tabPanels.forEach(function (tabPanel, panelIndex) {
+        tabPanel.classList.toggle('is-active', panelIndex === index);
+      });
+      aboutPanel.classList.remove('is-active');
+      if (aboutButton) aboutButton.setAttribute('aria-pressed', 'false');
+    }
+    tabDefinitions.forEach(function (definition, index) {
+      var tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = CONTROL_MENU_CLASS + '__tab';
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-selected', String(index === 0));
+      tab.appendChild(createMaterialIcon(definition.icon));
+      tab.appendChild(document.createTextNode(definition.label));
+      var panel = document.createElement('div');
+      panel.className = CONTROL_MENU_CLASS + '__tab-panel' + (index === 0 ? ' is-active' : '');
+      panel.setAttribute('role', 'tabpanel');
+      panel.appendChild(definition.group);
+      tab.addEventListener('click', function () {
+        showSettingsPanel(index);
+      });
+      tabs.appendChild(tab);
+      tabPanels.push(panel);
+    });
+    tabPanels.forEach(function (panel) { layout.appendChild(panel); });
+    layout.appendChild(aboutPanel);
+    var themeControl = document.createElement('div');
+    themeControl.className = CONTROL_MENU_CLASS + '__theme';
+    var themeLabel = document.createElement('div');
+    themeLabel.className = CONTROL_MENU_CLASS + '__theme-label';
+    var themeIcon = createMaterialIcon('palette');
+    themeIcon.className += ' ' + CONTROL_MENU_CLASS + '__theme-icon';
+    themeLabel.appendChild(themeIcon);
+    themeLabel.appendChild(document.createTextNode('主題'));
+    themeControl.appendChild(themeLabel);
+    var themeSelect = createMenuSelect(
+      '',
       'commentStyle',
       tools.features.commentStyles.getOptions(),
       state,
       options.onSettingChange
     );
-    themeControl.classList.add(CONTROL_MENU_CLASS + '__theme');
+    themeSelect.classList.add(CONTROL_MENU_CLASS + '__theme-select-control');
+    themeControl.appendChild(themeSelect.querySelector('select'));
+    var tabRow = document.createElement('div');
+    tabRow.className = CONTROL_MENU_CLASS + '__tab-row';
+    tabRow.appendChild(tabs);
+    aboutButton = createAboutButton(function () {
+      Array.prototype.forEach.call(tabs.children, function (tab) {
+        tab.setAttribute('aria-selected', 'false');
+      });
+      tabPanels.forEach(function (panel) { panel.classList.remove('is-active'); });
+      aboutPanel.classList.add('is-active');
+      aboutButton.setAttribute('aria-pressed', 'true');
+    });
+    tabRow.appendChild(aboutButton);
     menu.appendChild(themeControl);
+    menu.appendChild(tabRow);
     menu.appendChild(layout);
-    menu.appendChild(createActions(options.onReset));
+    menu.appendChild(createActions());
 
     controls.appendChild(gear);
     controls.appendChild(menu);
@@ -575,6 +892,11 @@
 
   function sync(state, disabledSettings) {
     disabledSettings = disabledSettings || [];
+    Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__avatar-option'), function (option) {
+      var selected = state[option.dataset.commentThreadSetting] === option.dataset.commentThreadValue;
+      option.classList.toggle('is-active', selected);
+      option.setAttribute('aria-pressed', String(selected));
+    });
     Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__switch'), function (toggle) {
       var enabled = Boolean(state[toggle.dataset.commentThreadSetting]);
       toggle.checked = enabled;
@@ -595,10 +917,12 @@
       var disabledByStyle = disabledSettings.indexOf(select.dataset.commentThreadSetting) !== -1;
       select.disabled = disabledByStyle;
       var selectLabel = select.closest('label');
-      selectLabel.hidden = false;
-      selectLabel.classList.toggle('is-hidden', disabledByStyle);
-      selectLabel.classList.toggle('is-disabled', false);
-      selectLabel.title = '';
+      if (selectLabel) {
+        selectLabel.hidden = false;
+        selectLabel.classList.toggle('is-hidden', disabledByStyle);
+        selectLabel.classList.toggle('is-disabled', false);
+        selectLabel.title = '';
+      }
     });
     Array.prototype.forEach.call(document.querySelectorAll('.' + CONTROL_MENU_CLASS + '__number'), function (input) {
       input.value = String(state[input.dataset.commentThreadSetting]);

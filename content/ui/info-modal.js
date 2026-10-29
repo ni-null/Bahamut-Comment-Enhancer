@@ -98,7 +98,7 @@
     projectLink.rel = 'noopener noreferrer';
     project.appendChild(projectLink);
     var introductionHeading = createHeading('h3', '介紹');
-    var introduction = createElement('p', '', '提供階層留言、熱門排序與多種留言顯示優化，僅在巴哈 C.php、Co.php 頁面運作。');
+    var introduction = createElement('p', '', '支援預設、區塊化與 GNN 留言主題，並提供階層留言、收合討論串、熱門排序、自動展開、回覆框跟隨、標記優化、頭像與時間顯示調整，以及圖片預覽、圖片燈箱與 YouTube 燈箱播放。功能僅在巴哈姆特 C.php、Co.php 頁面運作。');
     var privacy = createElement('p', '', '本項目開源，無廣告，無營利，無追蹤統計資料回傳，所有處理都在本地電腦完成。');
 
     dialog.appendChild(closeButton);
@@ -112,6 +112,10 @@
     dialog.appendChild(privacy);
     modal.appendChild(backdrop);
     modal.appendChild(dialog);
+    // 資訊視窗位於主選單 DOM 外；阻止其點擊冒泡到主選單外部關閉監聽器。
+    modal.addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
     closeButton.addEventListener('click', close);
     backdrop.addEventListener('click', close);
     document.addEventListener('keydown', function (event) {
